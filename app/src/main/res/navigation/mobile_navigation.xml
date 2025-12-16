@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_timeline">
+
+    <fragment
+        android:id="@+id/navigation_timeline"
+        android:name="com.practice.astra.ui.timeline.TimelineFragment"
+        android:label="@string/title_timeline"
+        tools:layout="@layout/fragment_timeline" />
+
+    <fragment
+        android:id="@+id/navigation_dashboard"
+        android:name="com.practice.astra.ui.ticket.TicketFragment"
+        android:label="@string/title_ticket"
+        tools:layout="@layout/fragment_ticket" />
+
+    <fragment
+        android:id="@+id/navigation_route"
+        android:name="com.practice.astra.ui.route.RouteFragment"
+        android:label="@string/title_route"
+        tools:layout="@layout/fragment_route" />
+
+    <fragment
+        android:id="@+id/navigation_user"
+        android:name="com.practice.astra.ui.user.UserFragment"
+        android:label="@string/title_user"
+        tools:layout="@layout/fragment_user" />
+
+    <fragment
+        android:id="@+id/ticketDetailFragment"
+        android:name="com.practice.astra.ui.ticket.TicketDetailFragment"
+        android:label="チケット詳細"
+        tools:layout="@layout/fragment_ticket_detail" />
+
+    <fragment
+        android:id="@+id/followListFragment"
+        android:name="com.practice.astra.ui.followList.FollowUserListTabFragment"
+        android:label="フォロー/フォロワー"
+        tools:layout="@layout/fragment_follow_user_list_tab" >
+
+        <argument
+            android:name="initial_tab_index"
+            app:argType="integer"
+            android:defaultValue="0" />
+
+    </fragment>
+
+
+
+</navigation>
