@@ -4,11 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.practice.astra.R
-import com.practice.astra.data.TicketData
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.practice.astra.R
 import com.practice.astra.databinding.FragmentUserBinding
 import com.practice.astra.ui.base.BaseTicketListFragment
+import com.practice.astra.ui.ticket.RecyclerAdapter
 
 const val ARG_INITIAL_TAB = "initial_tab_index"
 const val TAB_INDEX_FOLLOWING = 0
@@ -19,69 +20,76 @@ class UserFragment : BaseTicketListFragment() {
     private var _binding: FragmentUserBinding? = null
     private val binding get() = _binding!!
 
+    private val viewModel: UserViewModel by viewModels()
+
+    private var recommendedAdapter: RecyclerAdapter? = null
+    private var writingAdapter: RecyclerAdapter? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentUserBinding.inflate(inflater, container, false)
-        val view = binding.root
-        return view
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupObservers()
+        setupClickListeners()
+
+        viewModel.loadUserData()
+    }
+
+    private fun setupObservers() {
+        // おすすめリスト
+        viewModel.recommendedTickets.observe(viewLifecycleOwner) { tickets ->
+            if (recommendedAdapter == null) {
+                recommendedAdapter = setupRecyclerView(
+                    binding.recyclerViewRecommended,
+                    tickets,
+                    { ticket -> commonHandleItemClick(ticket) }
+                )
+            } else {
+                recommendedAdapter?.updateData(tickets)
+            }
+        }
+
+        // 口コミ
+        viewModel.reviews.observe(viewLifecycleOwner) { tickets ->
+            if (writingAdapter == null) {
+                writingAdapter = setupRecyclerView(
+                    binding.recyclerViewWriting,
+                    tickets,
+                    { ticket -> commonHandleItemClick(ticket) }
+                )
+            } else {
+                writingAdapter?.updateData(tickets)
+            }
+        }
+    }
+
+    // フォロー・フォロワー一覧への遷移
+    private fun setupClickListeners() {
+        binding.textFollowing.setOnClickListener {
+            navigateToFollowList(TAB_INDEX_FOLLOWING)
+        }
+
+        binding.textFollower.setOnClickListener {
+            navigateToFollowList(TAB_INDEX_FOLLOWER)
+        }
+    }
+
+    private fun navigateToFollowList(initialTab: Int) {
+        val bundle = Bundle().apply {
+            putInt(ARG_INITIAL_TAB, initialTab)
+        }
+        findNavController().navigate(R.id.followListFragment, bundle)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setupRecyclerView(
-            recyclerView = binding.recyclerViewRecommended,
-            listData = generateRecommendedListData(),
-            onItemClick = {ticketData -> commonHandleItemClick(ticketData)}
-        )
-
-        setupRecyclerView(
-            recyclerView = binding.recyclerViewWriting,
-            listData = generateWritingListData(),
-            onItemClick = {ticketData -> commonHandleItemClick(ticketData)}
-        )
-
-        binding.textFollowing.setOnClickListener{
-            val bundle = Bundle().apply {
-                putInt(ARG_INITIAL_TAB, TAB_INDEX_FOLLOWING)
-            }
-            findNavController().navigate(
-                R.id.followListFragment, // 遷移先ID (nav_graph.xmlで定義されていることを前提とする)
-                bundle
-            )
-        }
-
-        binding.textFollower.setOnClickListener{
-            val bundle = Bundle().apply {
-                putInt(ARG_INITIAL_TAB, TAB_INDEX_FOLLOWER)
-            }
-            findNavController().navigate(
-                R.id.followListFragment, // 遷移先ID
-                bundle
-            )
-        }
-    }
-
-    // データ生成
-    private fun generateRecommendedListData():List<TicketData>{
-        return listOf(
-            TicketData("aaaaa", R.drawable.ticket_image, "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, false),
-            TicketData("aaaaa", R.drawable.ticket_image, "よだか高等学校演劇部", "よだかホール", 0, true),
-            TicketData("aaaaa", R.drawable.ticket_image, "劇団セロ弾き", "セロ弾き記念ホール", 1200, true)
-        )
-    }
-    private fun generateWritingListData():List<TicketData>{
-        return listOf(
-            TicketData("aaaaa", R.drawable.ticket_image, "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, false),
-            TicketData("aaaaa", R.drawable.ticket_image, "よだか高等学校演劇部", "よだかホール", 0, true),
-            TicketData("aaaaa", R.drawable.ticket_image, "劇団セロ弾き", "セロ弾き記念ホール", 1200, true),
-            TicketData("aaaaa", R.drawable.ticket_image, "劇団銀河", "銀河文化会館", 650, false)
-        )
     }
 }

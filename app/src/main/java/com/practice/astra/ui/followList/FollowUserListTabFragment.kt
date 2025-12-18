@@ -37,7 +37,6 @@ class FollowUserListTabFragment : BaseTabFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupTabs()
         val initialTabIndex = arguments?.getInt(ARG_INITIAL_TAB, 0) ?: 0
         if (initialTabIndex != 0) {
             getViewPager().setCurrentItem(initialTabIndex, false)

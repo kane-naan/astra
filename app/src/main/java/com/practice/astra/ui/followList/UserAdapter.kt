@@ -14,7 +14,7 @@ class UserViewHolder(val binding: UserListItemBinding) : RecyclerView.ViewHolder
         binding.userMessage.text = data.message
 
         // フォロー状態に応じてボタンのテキストとスタイルを切り替える
-        if (data.follow) {
+        if (data.isToggled) {
             binding.followButton.text = "フォロー中"
             binding.followButton.setTextColor(binding.root.context.getColor(R.color.blueGray))
         } else {
@@ -52,5 +52,11 @@ class UserAdapter(
         holder.binding.followButton.setOnClickListener {
             onFollowToggle(user)
         }
+
+    }
+    fun updateData(newData: List<UserList>) {
+        listData.clear()
+        listData.addAll(newData)
+        notifyDataSetChanged()
     }
 }

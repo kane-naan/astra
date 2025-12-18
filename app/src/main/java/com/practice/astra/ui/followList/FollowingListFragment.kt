@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import com.practice.astra.R
 import com.practice.astra.data.UserList
 import com.practice.astra.databinding.FragmentBaseUserListBinding
@@ -13,6 +14,9 @@ class FollowingListFragment : BaseUserListFragment() {
 
     private var _binding: FragmentBaseUserListBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: UserListViewModel by viewModels()
+    private var adapter: UserAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,24 +28,23 @@ class FollowingListFragment : BaseUserListFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupUserRecyclerView(
-            recyclerView = binding.userListRecyclerView,
-            listData = generateFollowingListData(),
-            onUserClick = { userList -> commonHandleUserClick(userList) }
-        )
+
+        viewModel.userList.observe(viewLifecycleOwner) { users ->
+            if (adapter == null) {
+                adapter = setupUserRecyclerView(
+                    recyclerView = binding.userListRecyclerView,
+                    listData = users,
+                    onUserClick = { user -> commonHandleUserClick(user) }
+                )
+            } else {
+                adapter?.updateData(users)
+            }
+        }
+        viewModel.loadUsers(isFollowing = true)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun generateFollowingListData(): List<UserList> {
-        return listOf(
-            UserList("ユーザー A", R.drawable.user_icon, "Hello from A", true),
-            UserList("ユーザー B", R.drawable.user_icon, "Bのメッセージ", true),
-            UserList("ユーザー C", R.drawable.user_icon, "Cだよ", true),
-            UserList("ユーザー D", R.drawable.user_icon, "新着!", false)
-        )
     }
 }

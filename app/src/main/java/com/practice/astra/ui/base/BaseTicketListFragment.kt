@@ -4,12 +4,13 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.practice.astra.RecyclerAdapter
+import com.practice.astra.ui.ticket.RecyclerAdapter
 import com.practice.astra.data.TicketData
 import java.util.ArrayList
 import android.util.Log
 import androidx.navigation.fragment.findNavController
 import com.practice.astra.R
+import com.practice.astra.util.ListUtils
 
 /**
  * チケット抽象基底クラス
@@ -34,7 +35,7 @@ abstract class BaseTicketListFragment : Fragment() {
         recyclerView: RecyclerView,
         listData: List<TicketData>,
         onItemClick:(TicketData) -> Unit
-    ):RecyclerAdapter{
+    ): RecyclerAdapter {
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
         lateinit var adapter: RecyclerAdapter
@@ -64,11 +65,8 @@ abstract class BaseTicketListFragment : Fragment() {
         adapter: RecyclerAdapter,
         list: List<TicketData>
     ) {
-        data.bookmark = !data.bookmark
-        Log.d("BaseFragment", "共通ブックマーククリック: ${data.title} -> 新しい状態: ${data.bookmark}")
-        val index = list.indexOf(data)
-        if (index != -1) {
-            adapter.notifyItemChanged(index)
+        ListUtils.handleToggle(data, adapter, list) { updatedData ->
+            Log.d("BaseTicketListFragment", "Firebase更新待機: ${updatedData.title} (ID: ${updatedData.id})")
         }
     }
 }

@@ -4,14 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.practice.astra.R
-import com.practice.astra.data.TicketData
+import androidx.fragment.app.viewModels
 import com.practice.astra.databinding.FragmentPurchasedTicketsBinding
 import com.practice.astra.ui.base.BaseTicketListFragment
 
 class PurchasedTicketsFragment : BaseTicketListFragment() {
     private var _binding: FragmentPurchasedTicketsBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: TicketViewModel by viewModels()
+
+    private var unusedAdapter: RecyclerAdapter? = null
+    private var expiredAdapter: RecyclerAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,42 +33,29 @@ class PurchasedTicketsFragment : BaseTicketListFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val unusedAdapter = setupRecyclerView(
-            recyclerView = binding.recyclerViewUnused,
-            listData = generateUnusedListData(),
-            onItemClick = {ticketData -> commonHandleItemClick(ticketData)}
-        )
+        viewModel.purchasedTickets.observe(viewLifecycleOwner) { (unusedList, expiredList) ->
+            // 未使用チケットリスト
+            if (unusedAdapter == null) {
+                unusedAdapter = setupRecyclerView(
+                    binding.recyclerViewUnused,
+                    unusedList,
+                    { ticket -> commonHandleItemClick(ticket) }
+                )
+            } else {
+                unusedAdapter?.updateData(unusedList)
+            }
 
-        val expiredAdapter = setupRecyclerView(
-            recyclerView = binding.recyclerViewExpired,
-            listData = generateExpiredListData(),
-            onItemClick = {ticketData -> commonHandleItemClick(ticketData)}
-        )
-    }
-
-    // データ生成
-    private fun generateUnusedListData():List<TicketData>{
-        return listOf(
-            TicketData("aaaaa", R.drawable.ticket_image, "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, false),
-            TicketData("aaaaa", R.drawable.ticket_image, "よだか高等学校演劇部", "よだかホール", 0, true),
-            TicketData("aaaaa", R.drawable.ticket_image, "劇団セロ弾き", "セロ弾き記念ホール", 1200, true),
-            TicketData("aaaaa", R.drawable.ticket_image, "劇団銀河", "銀河文化会館", 650, false),
-            TicketData("aaaaa", R.drawable.ticket_image, "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, false),
-            TicketData("aaaaa", R.drawable.ticket_image, "よだか高等学校演劇部", "よだかホール", 0, true),
-            TicketData("aaaaa", R.drawable.ticket_image, "劇団セロ弾き", "セロ弾き記念ホール", 700, true),
-            TicketData("aaaaa", R.drawable.ticket_image, "劇団銀河", "銀河文化会館", 700, false)
-        )
-    }
-    private fun generateExpiredListData():List<TicketData>{
-        return listOf(
-            TicketData("aaaaa", R.drawable.ticket_image, "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, false),
-            TicketData("aaaaa", R.drawable.ticket_image, "よだか高等学校演劇部", "よだかホール", 0, true),
-            TicketData("aaaaa", R.drawable.ticket_image, "劇団セロ弾き", "セロ弾き記念ホール", 1200, true),
-            TicketData("aaaaa", R.drawable.ticket_image, "劇団銀河", "銀河文化会館", 650, false),
-            TicketData("aaaaa", R.drawable.ticket_image, "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, false),
-            TicketData("aaaaa", R.drawable.ticket_image, "よだか高等学校演劇部", "よだかホール", 0, true),
-            TicketData("aaaaa", R.drawable.ticket_image, "劇団セロ弾き", "セロ弾き記念ホール", 700, true),
-            TicketData("aaaaa", R.drawable.ticket_image, "劇団銀河", "銀河文化会館", 700, false)
-        )
+            // 使用済みチケットリスト
+            if (expiredAdapter == null) {
+                expiredAdapter = setupRecyclerView(
+                    binding.recyclerViewExpired,
+                    expiredList,
+                    { ticket -> commonHandleItemClick(ticket) }
+                )
+            } else {
+                expiredAdapter?.updateData(expiredList)
+            }
+        }
+        viewModel.loadPurchasedTickets()
     }
 }

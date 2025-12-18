@@ -13,13 +13,11 @@ class TicketDetailFragment : BaseTabFragment() {
     private var _binding: FragmentTicketDetailBinding? = null
     private val binding get() = _binding!!
 
-    // タブタイトルを定義
     override val tabTitles: List<String> = listOf("チケット情報", "団体情報")
-    override val bindingRoot: View get() = bindingRoot
+    override val bindingRoot: View get() = binding.root
     override fun getTabLayout() = binding.ticketDetailTabLayout
     override fun getViewPager() = binding.pager
 
-    // 切り替え先フラグメント
     override fun createTabFragment(position: Int): Fragment {
         return when(position){
             0 -> TicketInformationFragment()

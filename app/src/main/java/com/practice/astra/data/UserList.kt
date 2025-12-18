@@ -1,8 +1,9 @@
 package com.practice.astra.data
 
 data class UserList(
+    override val id: String,
     val userName: String,
     val image: Int,
     val message: String,
-    var follow:Boolean
-)
+    override var isToggled: Boolean
+):ToggleableItem

@@ -1,4 +1,4 @@
-package com.practice.astra
+package com.practice.astra.ui.ticket
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

@@ -1,5 +1,6 @@
 package com.practice.astra.ui.base
 
+import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -19,6 +20,11 @@ abstract class BaseTabFragment: Fragment() {
     protected abstract fun getTabLayout(): TabLayout
     protected abstract fun getViewPager():  ViewPager2
     protected abstract fun createTabFragment(position: Int): Fragment
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupTabs()
+    }
 
     protected fun setupTabs(){
         val viewPager = getViewPager()
