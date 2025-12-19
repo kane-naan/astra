@@ -1,4 +1,4 @@
-package com.practice.astra.ui.ticket
+package com.practice.astra.ui.ticketDetail
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.practice.astra.databinding.FragmentTicketDetailBinding
 import com.practice.astra.ui.base.BaseTabFragment
+import com.practice.astra.ui.ticket.TicketInformationFragment
 
 class TicketDetailFragment : BaseTabFragment() {
 

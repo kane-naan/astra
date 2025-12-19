@@ -11,11 +11,7 @@ import com.practice.astra.ui.base.BaseTicketListFragment
 class PurchasedTicketsFragment : BaseTicketListFragment() {
     private var _binding: FragmentPurchasedTicketsBinding? = null
     private val binding get() = _binding!!
-
     private val viewModel: TicketViewModel by viewModels()
-
-    private var unusedAdapter: RecyclerAdapter? = null
-    private var expiredAdapter: RecyclerAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,29 +29,12 @@ class PurchasedTicketsFragment : BaseTicketListFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.purchasedTickets.observe(viewLifecycleOwner) { (unusedList, expiredList) ->
-            // 未使用チケットリスト
-            if (unusedAdapter == null) {
-                unusedAdapter = setupRecyclerView(
-                    binding.recyclerViewUnused,
-                    unusedList,
-                    { ticket -> commonHandleItemClick(ticket) }
-                )
-            } else {
-                unusedAdapter?.updateData(unusedList)
-            }
-
-            // 使用済みチケットリスト
-            if (expiredAdapter == null) {
-                expiredAdapter = setupRecyclerView(
-                    binding.recyclerViewExpired,
-                    expiredList,
-                    { ticket -> commonHandleItemClick(ticket) }
-                )
-            } else {
-                expiredAdapter?.updateData(expiredList)
-            }
-        }
+        setupObservers()
         viewModel.loadPurchasedTickets()
+    }
+
+    private fun setupObservers() {
+        observeAndSync(viewModel.unusedTickets, binding.recyclerViewUnused)
+        observeAndSync(viewModel.expiredTickets, binding.recyclerViewExpired)
     }
 }

@@ -22,9 +22,6 @@ class UserFragment : BaseTicketListFragment() {
 
     private val viewModel: UserViewModel by viewModels()
 
-    private var recommendedAdapter: RecyclerAdapter? = null
-    private var writingAdapter: RecyclerAdapter? = null
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,39 +32,15 @@ class UserFragment : BaseTicketListFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupObservers()
         setupClickListeners()
-
         viewModel.loadUserData()
     }
 
+    // 監視
     private fun setupObservers() {
-        // おすすめリスト
-        viewModel.recommendedTickets.observe(viewLifecycleOwner) { tickets ->
-            if (recommendedAdapter == null) {
-                recommendedAdapter = setupRecyclerView(
-                    binding.recyclerViewRecommended,
-                    tickets,
-                    { ticket -> commonHandleItemClick(ticket) }
-                )
-            } else {
-                recommendedAdapter?.updateData(tickets)
-            }
-        }
-
-        // 口コミ
-        viewModel.reviews.observe(viewLifecycleOwner) { tickets ->
-            if (writingAdapter == null) {
-                writingAdapter = setupRecyclerView(
-                    binding.recyclerViewWriting,
-                    tickets,
-                    { ticket -> commonHandleItemClick(ticket) }
-                )
-            } else {
-                writingAdapter?.updateData(tickets)
-            }
-        }
+        observeAndSync(viewModel.recommendedTickets, binding.recyclerViewRecommended)
+        observeAndSync(viewModel.reviews, binding.recyclerViewWriting)
     }
 
     // フォロー・フォロワー一覧への遷移

@@ -8,6 +8,7 @@ import com.practice.astra.ui.ticket.RecyclerAdapter
 import com.practice.astra.data.TicketData
 import java.util.ArrayList
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.navigation.fragment.findNavController
 import com.practice.astra.R
 import com.practice.astra.util.ListUtils
@@ -16,22 +17,9 @@ import com.practice.astra.util.ListUtils
  * チケット抽象基底クラス
  * チケットを表示する際にこのFragmentを継承する
  *
- * getRecyclerView:リサイクラービュー作成
- * generateListData:チケットアイテムのリスト
- * handleItemClisk:チケットアイテムがクリックされた時の処理
- * handleBookmarkClisk:ブックマークがクリックされた時の処理
- *
  * */
 abstract class BaseTicketListFragment : Fragment() {
-
-    /**
-     * setupRecyclerView
-     * 戻り値:RecyclerAdapter
-     *
-     * Adapterが呼び出し元に2つある場合、片方がオーバーライドされないよう
-     * 戻り値を設定
-     * */
-    protected fun setupRecyclerView(
+    private fun setupRecyclerView(
         recyclerView: RecyclerView,
         listData: List<TicketData>,
         onItemClick:(TicketData) -> Unit
@@ -67,6 +55,30 @@ abstract class BaseTicketListFragment : Fragment() {
     ) {
         ListUtils.handleToggle(data, adapter, list) { updatedData ->
             Log.d("BaseTicketListFragment", "Firebase更新待機: ${updatedData.title} (ID: ${updatedData.id})")
+        }
+    }
+
+    private fun syncRecyclerView(
+        recyclerView: RecyclerView,
+        listData: List<TicketData>,
+        onItemClick: (TicketData) -> Unit
+    ) {
+        val currentAdapter = recyclerView.adapter as? RecyclerAdapter
+        if (currentAdapter == null) {
+            setupRecyclerView(recyclerView, listData, onItemClick)
+        } else {
+            currentAdapter.updateData(listData)
+        }
+    }
+
+    protected fun observeAndSync(
+        liveData: LiveData<List<TicketData>>,
+        recyclerView: RecyclerView
+    ) {
+        liveData.observe(viewLifecycleOwner) { list ->
+            syncRecyclerView(recyclerView, list) { ticket ->
+                commonHandleItemClick(ticket)
+            }
         }
     }
 }

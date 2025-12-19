@@ -1,4 +1,4 @@
-package com.practice.astra.ui.ticket
+package com.practice.astra.ui.ticketDetail
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,14 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.practice.astra.databinding.FragmentOrganizationInformationBinding
 import com.practice.astra.ui.base.BaseTicketListFragment
+import com.practice.astra.ui.ticket.RecyclerAdapter
+import com.practice.astra.ui.ticket.TicketViewModel
 
 class OrganizationInformationFragment : BaseTicketListFragment() {
 
     private var _binding: FragmentOrganizationInformationBinding? = null
     private val binding get() = _binding!!
-
     private val viewModel: TicketViewModel by viewModels()
-    private var adapter: RecyclerAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,17 +26,7 @@ class OrganizationInformationFragment : BaseTicketListFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.organizationTickets.observe(viewLifecycleOwner) { tickets ->
-            if (adapter == null) {
-                adapter = setupRecyclerView(
-                    recyclerView = binding.recyclerView,
-                    listData = tickets,
-                    onItemClick = { ticket -> commonHandleItemClick(ticket) }
-                )
-            } else {
-                adapter?.updateData(tickets)
-            }
-        }
+        observeAndSync(viewModel.organizationTickets, binding.recyclerView)
         viewModel.loadOrganizationTickets()
     }
 

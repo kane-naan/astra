@@ -17,7 +17,6 @@ class TimelineFragment : BaseTicketListFragment() {
     private val binding get() = _binding!!
 
     private val viewModel: TimelineViewModel by viewModels()
-    private var adapter: RecyclerAdapter? = null
 
     private val TAG = "TimelineFragment"
 
@@ -37,17 +36,7 @@ class TimelineFragment : BaseTicketListFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.timelineTickets.observe(viewLifecycleOwner) { tickets ->
-            if (adapter == null) {
-                adapter = setupRecyclerView(
-                    recyclerView = binding.recyclerView,
-                    listData = tickets,
-                    onItemClick = { ticket -> commonHandleItemClick(ticket) }
-                )
-            } else {
-                adapter?.updateData(tickets)
-            }
-        }
+        observeAndSync(viewModel.timelineTickets, binding.recyclerView)
         viewModel.loadTimeline()
     }
 }

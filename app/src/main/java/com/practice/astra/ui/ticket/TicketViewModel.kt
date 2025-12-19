@@ -15,7 +15,8 @@ class TicketViewModel : ViewModel() {
 
     // 購入
     private val _purchasedTickets = MutableLiveData<Pair<List<TicketData>, List<TicketData>>>()
-    val purchasedTickets: LiveData<Pair<List<TicketData>, List<TicketData>>> = _purchasedTickets
+    val unusedTickets: LiveData<List<TicketData>> = _purchasedTickets.map { it.first }
+    val expiredTickets: LiveData<List<TicketData>> = _purchasedTickets.map { it.second }
 
     // ブックマーク済み
     private val _bookmarkedTickets = MutableLiveData<List<TicketData>>()

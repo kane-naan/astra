@@ -32,17 +32,7 @@ class BookmarkedTicketsFragment : BaseTicketListFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.bookmarkedTickets.observe(viewLifecycleOwner){ tickets ->
-            if(adapter == null){
-                adapter = setupRecyclerView(
-                    recyclerView = binding.recyclerView,
-                    listData = tickets,
-                    onItemClick = { ticket -> commonHandleItemClick(ticket) }
-                )
-            } else {
-                adapter?.updateData(tickets)
-            }
-        }
+        observeAndSync(viewModel.bookmarkedTickets, binding.recyclerView)
         viewModel.loadBookmarkedTickets()
     }
 }
