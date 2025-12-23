@@ -31,9 +31,9 @@
 
     <fragment
         android:id="@+id/ticketDetailFragment"
-        android:name="com.practice.astra.ui.ticketDetail.TicketDetailFragment"
+        android:name="com.practice.astra.ui.ticketDetail.TicketDetailTabFragment"
         android:label="チケット詳細"
-        tools:layout="@layout/fragment_ticket_detail" />
+        tools:layout="@layout/fragment_ticket_detail_tab" />
 
     <fragment
         android:id="@+id/followListFragment"

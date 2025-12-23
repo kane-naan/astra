@@ -5,14 +5,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.practice.astra.databinding.FragmentTicketDetailBinding
+import androidx.fragment.app.viewModels
+import com.practice.astra.databinding.FragmentTicketDetailTabBinding
 import com.practice.astra.ui.base.BaseTabFragment
-import com.practice.astra.ui.ticket.TicketInformationFragment
 
-class TicketDetailFragment : BaseTabFragment() {
+class TicketDetailTabFragment : BaseTabFragment() {
 
-    private var _binding: FragmentTicketDetailBinding? = null
+    private var _binding: FragmentTicketDetailTabBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: TicketDetailViewModel by viewModels()
 
     override val tabTitles: List<String> = listOf("チケット情報", "団体情報")
     override val bindingRoot: View get() = binding.root
@@ -32,13 +34,15 @@ class TicketDetailFragment : BaseTabFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentTicketDetailBinding.inflate(inflater, container, false)
+        _binding = FragmentTicketDetailTabBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupTabs()
+        viewModel.loadTicketDetails("001")
+        viewModel.loadOrganizationTickets()
     }
 
     override fun onDestroyView() {

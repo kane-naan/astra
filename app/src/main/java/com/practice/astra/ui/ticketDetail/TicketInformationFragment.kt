@@ -1,18 +1,18 @@
-package com.practice.astra.ui.ticket
+package com.practice.astra.ui.ticketDetail
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.practice.astra.databinding.FragmentTicketInformationBinding
 
 class TicketInformationFragment : Fragment() {
 
     private var _binding: FragmentTicketInformationBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: TicketViewModel by activityViewModels()
+    private val viewModel: TicketDetailViewModel by viewModels({ requireParentFragment() })
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,7 +33,6 @@ class TicketInformationFragment : Fragment() {
         viewModel.formattedPrice.observe(viewLifecycleOwner) { priceString ->
             binding.textPriceDetail.text = priceString
         }
-        viewModel.loadTicketDetail("001")
     }
 
     override fun onDestroyView() {
