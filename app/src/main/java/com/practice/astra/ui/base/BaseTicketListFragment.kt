@@ -38,14 +38,10 @@ abstract class BaseTicketListFragment : Fragment() {
         return adapter
     }
 
+    protected abstract fun onTicketClicked(ticket: TicketData)
+
     protected fun commonHandleItemClick(data: TicketData){
-        Log.d("BaseFragment", "共通アイテムクリック:${data.title}")
-        findNavController().navigate(
-            R.id.ticketDetailFragment,
-            Bundle().apply {
-                // putParcelable("ticket_data", data)
-            }
-        )
+        onTicketClicked(data)
     }
 
     private fun handleBookmarkToggleAndNotify(
@@ -76,9 +72,14 @@ abstract class BaseTicketListFragment : Fragment() {
         recyclerView: RecyclerView
     ) {
         liveData.observe(viewLifecycleOwner) { list ->
-            syncRecyclerView(recyclerView, list) { ticket ->
-                commonHandleItemClick(ticket)
-            }
+            syncRecyclerView(
+                recyclerView = recyclerView,
+                listData = list,
+                onItemClick = { ticket ->
+                    Log.d("DEBUG", "BaseTicketList: クリック検知 ${ticket.id}")
+                    commonHandleItemClick(ticket)
+                }
+            )
         }
     }
 }

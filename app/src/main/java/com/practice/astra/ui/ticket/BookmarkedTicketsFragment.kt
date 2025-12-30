@@ -5,8 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.findNavController
+import com.practice.astra.data.TicketData
 import com.practice.astra.ui.base.BaseTicketListFragment
 import com.practice.astra.databinding.FragmentBookmarkedTicketsBinding
+import com.practice.astra.R
+
 
 class BookmarkedTicketsFragment : BaseTicketListFragment() {
 
@@ -14,7 +18,13 @@ class BookmarkedTicketsFragment : BaseTicketListFragment() {
     private val binding get() = _binding!!
 
     private val viewModel: TicketViewModel by viewModels()
-    private var adapter: RecyclerAdapter? = null
+
+    override fun onTicketClicked(ticket: TicketData) {
+        android.util.Log.d("DEBUG", "チケットがクリックされました: ${ticket.id}")
+        val action = TicketFragmentDirections
+            .actionNavigationDashboardToTicketDetailTab(ticket.id)
+        requireActivity().findNavController(R.id.nav_host_fragment_activity_main).navigate(action)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

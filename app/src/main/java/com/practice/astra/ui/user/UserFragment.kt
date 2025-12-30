@@ -7,9 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.practice.astra.R
+import com.practice.astra.data.TicketData
 import com.practice.astra.databinding.FragmentUserBinding
 import com.practice.astra.ui.base.BaseTicketListFragment
 import com.practice.astra.ui.ticket.RecyclerAdapter
+import com.practice.astra.ui.timeline.TimelineFragmentDirections
 
 const val ARG_INITIAL_TAB = "initial_tab_index"
 const val TAB_INDEX_FOLLOWING = 0
@@ -21,6 +23,10 @@ class UserFragment : BaseTicketListFragment() {
     private val binding get() = _binding!!
 
     private val viewModel: UserViewModel by viewModels()
+    override fun onTicketClicked(ticket: TicketData) {
+        val action = UserFragmentDirections.actionUserToTicketDetailTab(ticket.id)
+        findNavController().navigate(action)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

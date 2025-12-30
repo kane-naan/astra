@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
 import com.practice.astra.databinding.FragmentTicketDetailTabBinding
 import com.practice.astra.ui.base.BaseTabFragment
 
@@ -14,6 +15,7 @@ class TicketDetailTabFragment : BaseTabFragment() {
     private var _binding: FragmentTicketDetailTabBinding? = null
     private val binding get() = _binding!!
 
+    private val args: TicketDetailTabFragmentArgs by navArgs()
     private val viewModel: TicketDetailViewModel by viewModels()
 
     override val tabTitles: List<String> = listOf("チケット情報", "団体情報")
@@ -41,7 +43,7 @@ class TicketDetailTabFragment : BaseTabFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupTabs()
-        viewModel.loadTicketDetails("001")
+        viewModel.loadTicketDetails(args.ticketId)
         viewModel.loadOrganizationTickets()
     }
 

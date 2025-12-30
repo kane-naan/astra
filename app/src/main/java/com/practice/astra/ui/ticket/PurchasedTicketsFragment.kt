@@ -5,6 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.findNavController
+import com.practice.astra.R
+import com.practice.astra.data.TicketData
 import com.practice.astra.databinding.FragmentPurchasedTicketsBinding
 import com.practice.astra.ui.base.BaseTicketListFragment
 
@@ -36,5 +39,11 @@ class PurchasedTicketsFragment : BaseTicketListFragment() {
     private fun setupObservers() {
         observeAndSync(viewModel.unusedTickets, binding.recyclerViewUnused)
         observeAndSync(viewModel.expiredTickets, binding.recyclerViewExpired)
+    }
+
+    override fun onTicketClicked(ticket: TicketData) {
+        val action = TicketFragmentDirections
+            .actionNavigationDashboardToTicketDetailTab(ticket.id)
+        requireActivity().findNavController(R.id.nav_host_fragment_activity_main).navigate(action)
     }
 }

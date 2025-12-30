@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.practice.astra.ui.base.BaseTicketListFragment
 import com.practice.astra.R
 import com.practice.astra.data.TicketData
@@ -19,6 +20,11 @@ class TimelineFragment : BaseTicketListFragment() {
     private val viewModel: TimelineViewModel by viewModels()
 
     private val TAG = "TimelineFragment"
+    override fun onTicketClicked(ticket: TicketData) {
+        val action = TimelineFragmentDirections
+            .actionNavigationTimelineToTicketDetailTab(ticket.id)
+        findNavController().navigate(action)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -9,13 +9,22 @@
         android:id="@+id/navigation_timeline"
         android:name="com.practice.astra.ui.timeline.TimelineFragment"
         android:label="@string/title_timeline"
-        tools:layout="@layout/fragment_timeline" />
+        tools:layout="@layout/fragment_timeline" >
+        <action
+            android:id="@+id/action_navigation_timeline_to_ticketDetailTab"
+            app:destination="@id/ticketDetailTabFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.practice.astra.ui.ticket.TicketFragment"
         android:label="@string/title_ticket"
-        tools:layout="@layout/fragment_ticket" />
+        tools:layout="@layout/fragment_ticket">
+
+        <action
+            android:id="@+id/action_navigation_dashboard_to_ticketDetailTab"
+            app:destination="@id/ticketDetailTabFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_route"
@@ -27,13 +36,11 @@
         android:id="@+id/navigation_user"
         android:name="com.practice.astra.ui.user.UserFragment"
         android:label="@string/title_user"
-        tools:layout="@layout/fragment_user" />
-
-    <fragment
-        android:id="@+id/ticketDetailFragment"
-        android:name="com.practice.astra.ui.ticketDetail.TicketDetailTabFragment"
-        android:label="チケット詳細"
-        tools:layout="@layout/fragment_ticket_detail_tab" />
+        tools:layout="@layout/fragment_user" >
+        <action
+            android:id="@+id/action_user_to_ticketDetailTab"
+            app:destination="@id/ticketDetailTabFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/followListFragment"
@@ -48,6 +55,39 @@
 
     </fragment>
 
+    <fragment
+        android:id="@+id/purchasedTicketsFragment"
+        android:name="com.practice.astra.ui.ticket.PurchasedTicketsFragment" >
+
+        <action
+            android:id="@+id/action_purchasedTickets_to_ticketDetailTab"
+            app:destination="@id/ticketDetailTabFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/ticketDetailTabFragment"
+        android:name="com.practice.astra.ui.ticketDetail.TicketDetailTabFragment" >
+        <argument
+            android:name="ticketId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/bookmarkedTicketsFragment"
+        android:name="com.practice.astra.ui.ticket.BookmarkedTicketsFragment" >
+
+        <action
+            android:id="@+id/action_bookmarkedTickets_to_ticketDetailTab"
+            app:destination="@id/ticketDetailTabFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/organizationInformationFragment"
+        android:name="com.practice.astra.ui.ticketDetail.OrganizationInformationFragment" >
+        <action
+            android:id="@+id/action_organizationInformation_to_ticketDetailTab"
+            app:destination="@id/ticketDetailTabFragment" />
+    </fragment>
 
 
 </navigation>
