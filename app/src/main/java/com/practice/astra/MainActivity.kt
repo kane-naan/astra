@@ -2,6 +2,7 @@ package com.practice.astra
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
@@ -22,6 +23,14 @@ class MainActivity : AppCompatActivity() {
         // ボトムナビゲーション設定
         navController = findNavController(R.id.nav_host_fragment_activity_main)
         setupBottomNavigation(binding.navView)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.loginFragment) {
+                binding.navView.visibility = View.GONE
+            } else {
+                binding.navView.visibility = View.VISIBLE
+            }
+        }
     }
 
     /** 関数定義エリア */
