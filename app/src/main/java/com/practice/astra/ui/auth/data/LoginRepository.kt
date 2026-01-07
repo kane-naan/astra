@@ -27,23 +27,6 @@ class LoginRepository(val dataSource: LoginDataSource) {
         dataSource.logout()
     }
 
-//    fun login(username: String, password: String): Result<LoggedInUser> {
-//        val result = dataSource.login(username, password)
-//
-//        // デバッグ用ログ：実際の中身を Logcat で確認
-//        println("DEBUG: Login Result is $result")
-//
-//        if (result is Result.Success) {
-//            setLoggedInUser(result.data)
-//            return result
-//        } else {
-//            // 【テスト】もしエラーになっても、あえて成功として返してみる（切り分け用）
-//            // これで画面が遷移するなら、判定ロジックの問題。これでもダメならViewModelの問題。
-//            // return Result.Success(LoggedInUser("test", "Test User"))
-//        }
-//
-//        return result
-//    }
     fun login(username: String, password: String): Result<LoggedInUser> {
         // handle login
         val result = dataSource.login(username, password)
