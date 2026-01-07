@@ -7,7 +7,7 @@ import com.practice.astra.data.TicketData
 import com.practice.astra.databinding.TicketItemBinding
 
 class RecyclerAdapter (
-    private val listData: ArrayList<TicketData>,
+    private val listData: MutableList<TicketData>,
     private val onItemClick: (TicketData) -> Unit,
     private val onBookmarkClick: (TicketData) -> Unit
 ) : RecyclerView.Adapter<RecyclerViewHolder>() {

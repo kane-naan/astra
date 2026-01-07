@@ -2,8 +2,6 @@ package com.practice.astra.data
 
 import com.practice.astra.ui.common.ToggleableItem
 
-//import com.practice.astra.ui.common.ToggleableItem
-
 data class TicketData(
     override val id: String = "",
     val title: String = "",
