@@ -1,4 +1,4 @@
-package com.practice.astra.data
+package com.practice.astra.ui.common
 
 interface ToggleableItem {
     val id: String

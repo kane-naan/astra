@@ -20,16 +20,13 @@ class TicketDetailViewModel : ViewModel() {
 
     // チケット詳細
     fun loadTicketDetails(ticketId: String) {
-        _selectedTicketDetails.value = TicketData(
-            ticketId, "銀河鉄道の夜", R.drawable.ticket_image,
-            "劇団銀河", "銀河文化会館", 650, false
-        )
+        _selectedTicketDetails.value = TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false)
     }
 
     // 組織
     fun loadOrganizationTickets() {
         _organizationTickets.value = listOf(
-            TicketData("004", "未使用チケット", R.drawable.ticket_image, "劇団A", "ホールA", 1000, false)
+            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
         )
     }
 }

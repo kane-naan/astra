@@ -14,7 +14,8 @@
         android:layout_width="55dp"
         android:layout_height="55dp"
         android:layout_marginEnd="10dp"
-        android:layout_gravity="center_vertical" />
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ticket_image" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,7 +27,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:layout_marginBottom="2dp" />
+            android:layout_marginBottom="2dp"
+             />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -41,7 +43,6 @@
                 android:layout_marginEnd="5dp" />
 
             <TextView
-                android:id="@+id/itemPlaceMark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
@@ -66,26 +67,32 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <TextView
-                android:id="@+id/itemTextPriceMark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:layout_marginBottom="2dp"
                 android:textColor="@color/blueGray"
-                android:text="\u00A5"
-                android:layout_marginTop="5dp" />
+                android:text="\u00A5" />
 
             <TextView
                 android:id="@+id/ticketPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:layout_marginBottom="2dp"
                 android:textColor="@color/blueGray"
-                android:layout_marginTop="5dp" />
+                android:layout_marginEnd="10dp" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/ticketTags"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:chipSpacingHorizontal="4dp"
+                app:chipSpacingVertical="0dp"
+                app:singleLine="true" />
         </LinearLayout>
 
         <ImageView
@@ -94,7 +101,7 @@
             android:layout_height="30dp"
             android:layout_marginEnd="10dp"
             android:src="@drawable/baseline_bookmark_border_24"
-            android:layout_gravity="bottom|end"
+            android:layout_gravity="end"
             app:tint="@color/blueGray" />
     </LinearLayout>
 </LinearLayout>

@@ -15,13 +15,11 @@ class UserViewModel: ViewModel() {
 
     fun loadUserData() {
         _recommendedTickets.value = listOf(
-            TicketData("R01", "おすすめ作品A", R.drawable.ticket_image, "劇団アルファ", "シアターX", 1500, false),
-            TicketData("R02", "おすすめ作品B", R.drawable.ticket_image, "劇団ベータ", "ホールY", 2000, true)
+            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
         )
 
         _reviews.value = listOf(
-            TicketData("W01", "aaa", R.drawable.ticket_image, "自分", "未定", null, false),
-            TicketData("W02", "aaa", R.drawable.ticket_image, "自分", "未定", 0, false)
+            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
         )
     }
 }

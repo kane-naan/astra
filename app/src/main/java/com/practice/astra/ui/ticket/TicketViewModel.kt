@@ -22,17 +22,17 @@ class TicketViewModel : ViewModel() {
 
     fun loadPurchasedTickets() {
         val unused = listOf(
-            TicketData("001", "未使用チケット", R.drawable.ticket_image, "劇団A", "ホールA", 1000, false)
+            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
         )
         val expired = listOf(
-            TicketData("002", "使用済みチケット", R.drawable.ticket_image, "劇団B", "ホールB", 0, true)
+            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
         )
         _purchasedTickets.value = Pair(unused, expired)
     }
 
     fun loadBookmarkedTickets() {
         _bookmarkedTickets.value = listOf(
-            TicketData("003", "ブックマーク中", R.drawable.ticket_image, "劇団C", "ホールC", 1200, true)
+            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
         )
     }
 

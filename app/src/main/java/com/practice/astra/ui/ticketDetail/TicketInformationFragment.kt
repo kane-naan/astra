@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.practice.astra.R
 import com.practice.astra.databinding.FragmentTicketInformationBinding
 
 class TicketInformationFragment : Fragment() {
@@ -27,7 +28,7 @@ class TicketInformationFragment : Fragment() {
         viewModel.selectedTicketDetails.observe(viewLifecycleOwner) { ticket ->
             binding.textContentDetail.text = ticket.title
             binding.textLocationDetail.text = ticket.place
-            binding.includeTicketItem.ticketImage.setImageResource(ticket.image)
+            binding.includeTicketItem.ticketImage.setImageResource(R.drawable.ticket_image)
             binding.includeTicketItem.ticketActor.text = ticket.actor
         }
         viewModel.formattedPrice.observe(viewLifecycleOwner) { priceString ->

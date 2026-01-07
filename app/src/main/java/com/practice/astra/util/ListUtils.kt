@@ -1,7 +1,7 @@
 package com.practice.astra.util
 
 import androidx.recyclerview.widget.RecyclerView
-import com.practice.astra.data.ToggleableItem
+import com.practice.astra.ui.common.ToggleableItem
 
 object ListUtils {
     fun <T : ToggleableItem> handleToggle(
