@@ -26,10 +26,23 @@ class TicketInformationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.selectedTicketDetails.observe(viewLifecycleOwner) { ticket ->
-            binding.textContentDetail.text = ticket.title
+            binding.textContentDetail.text = ticket.description
+            binding.textDateDetail.text = ticket.event_date
+            binding.textHighlightDetail.text = ticket.point
             binding.textLocationDetail.text = ticket.place
             binding.includeTicketItem.ticketImage.setImageResource(R.drawable.ticket_image)
             binding.includeTicketItem.ticketActor.text = ticket.actor
+
+            binding.includeTicketItem.apply {
+                ticketTitle.text = ticket.title
+                ticketActor.text = ticket.actor
+                ticketPlace.text = ticket.place
+                ticketPrice.text = ticket.price?.toString() ?: "0"
+                ticketImage.setImageResource(R.drawable.ticket_image)
+
+                val icon = if (ticket.isToggled) R.drawable.baseline_bookmark_24 else R.drawable.baseline_bookmark_border_24
+                ticketBookmark.setImageResource(icon)
+            }
         }
         viewModel.formattedPrice.observe(viewLifecycleOwner) { priceString ->
             binding.textPriceDetail.text = priceString

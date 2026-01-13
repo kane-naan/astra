@@ -40,6 +40,11 @@ class OrganizationInformationFragment : BaseTicketListFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeAndSync(viewModel.organizationTickets, binding.recyclerView)
+
+        viewModel.organizationDetail.observe(viewLifecycleOwner) { org ->
+            binding.textOrganizationDescription.text = org.description
+            binding.textActivitySchedule.text = org.schedule
+        }
     }
 
     override fun onDestroyView() {

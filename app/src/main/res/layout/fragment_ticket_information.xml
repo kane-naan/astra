@@ -29,38 +29,41 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingBottom="80dp">
-                <TextView style="@style/DetailSectionTitle" android:text="●内容" />
+                <TextView style="@style/DetailSectionTitle" android:text="●内容"
+                    android:textColor="@color/darkGray"/>
                 <TextView
                     android:id="@+id/text_content_detail"
                     style="@style/DetailSectionBody"
-                    android:text="サックス4重奏「メリーウィドウ」\n他、ポップス曲など" />
+                    android:textColor="@color/darkGray"
+                    />
 
-                <TextView style="@style/DetailSectionTitle" android:text="●日時" />
+                <TextView style="@style/DetailSectionTitle" android:text="●日時" android:textColor="@color/darkGray"/>
                 <TextView
                     android:id="@+id/text_date_detail"
                     style="@style/DetailSectionBody"
-                    android:text="〇月〇日 〇時〇分" />
+                    android:textColor="@color/darkGray"
+                     />
 
 
-                <TextView style="@style/DetailSectionTitle" android:text="●チケット代" />
+                <TextView style="@style/DetailSectionTitle" android:text="●チケット代" android:textColor="@color/darkGray"/>
                 <TextView
                     android:id="@+id/text_price_detail"
                     style="@style/DetailSectionBody"
-                    android:text="無料" />
+                    android:textColor="@color/darkGray"/>
 
 
-                <TextView style="@style/DetailSectionTitle" android:text="●場所" />
+                <TextView style="@style/DetailSectionTitle" android:text="●場所" android:textColor="@color/darkGray"/>
                 <TextView
                     android:id="@+id/text_location_detail"
                     style="@style/DetailSectionBody"
-                    android:text="〇〇高校体育館\n愛知県名古屋市緑区鳴海町熊の前\n最寄り駅からバス7分" />
+                    android:textColor="@color/darkGray" />
 
 
-                <TextView style="@style/DetailSectionTitle" android:text="●見どころ" />
+                <TextView style="@style/DetailSectionTitle" android:text="●見どころ" android:textColor="@color/darkGray"/>
                 <TextView
                     android:id="@+id/text_highlight_detail"
                     style="@style/DetailSectionBody"
-                    android:text="サックス5重奏はアンサンブルコンテストに向けて練習中の楽曲です！" />
+                    android:textColor="@color/darkGray" />
 
             </LinearLayout>
         </LinearLayout>

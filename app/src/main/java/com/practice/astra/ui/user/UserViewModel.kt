@@ -14,12 +14,12 @@ class UserViewModel: ViewModel() {
     val reviews: LiveData<List<TicketData>> = _reviews
 
     fun loadUserData() {
-        _recommendedTickets.value = listOf(
-            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
-        )
-
-        _reviews.value = listOf(
-            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
-        )
+//        _recommendedTickets.value = listOf(
+//            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
+//        )
+//
+//        _reviews.value = listOf(
+//            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
+//        )
     }
 }

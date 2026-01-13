@@ -9,6 +9,10 @@ data class TicketData(
     val actor: String = "",
     val place: String = "",
     val price: Int? = null,
+    val description: String = "", // 内容
+    val event_date: String = "",  // 日時
+    val point: String = "",       // 見どころ
+    val organizationId: String = "",
     val tags: List<String> = emptyList(),
     override var isToggled: Boolean = false
 ) : ToggleableItem

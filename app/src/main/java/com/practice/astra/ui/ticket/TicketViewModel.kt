@@ -21,19 +21,19 @@ class TicketViewModel : ViewModel() {
     }
 
     fun loadPurchasedTickets() {
-        val unused = listOf(
-            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
-        )
-        val expired = listOf(
-            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
-        )
-        _purchasedTickets.value = Pair(unused, expired)
+//        val unused = listOf(
+//            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
+//        )
+//        val expired = listOf(
+//            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
+//        )
+//        _purchasedTickets.value = Pair(unused, expired)
     }
 
     fun loadBookmarkedTickets() {
-        _bookmarkedTickets.value = listOf(
-            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
-        )
+//        _bookmarkedTickets.value = listOf(
+//            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
+//        )
     }
 
     fun toggleBookmark(ticket: TicketData) {

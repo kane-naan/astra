@@ -44,7 +44,10 @@ class TicketDetailTabFragment : BaseTabFragment() {
         super.onViewCreated(view, savedInstanceState)
         setupTabs()
         viewModel.loadTicketDetails(args.ticketId)
-        viewModel.loadOrganizationTickets()
+        viewModel.selectedTicketDetails.observe(viewLifecycleOwner) { ticket ->
+            viewModel.loadOrganizationTickets(ticket.actor)
+            viewModel.loadOrganizationInfo(ticket.actor)
+        }
     }
 
     override fun onDestroyView() {
