@@ -26,6 +26,10 @@ class BookmarkedTicketsFragment : BaseTicketListFragment() {
         requireActivity().findNavController(R.id.nav_host_fragment_activity_main).navigate(action)
     }
 
+    override fun onBookmarkClicked(ticket: TicketData) {
+        viewModel.toggleBookmark(ticket.id)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

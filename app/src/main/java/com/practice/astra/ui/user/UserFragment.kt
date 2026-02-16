@@ -28,6 +28,10 @@ class UserFragment : BaseTicketListFragment() {
         findNavController().navigate(action)
     }
 
+    override fun onBookmarkClicked(ticket: TicketData) {
+
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

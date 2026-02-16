@@ -10,6 +10,7 @@ import com.practice.astra.ui.base.BaseTicketListFragment
 import com.practice.astra.R
 import com.practice.astra.data.TicketData
 import com.practice.astra.databinding.FragmentTimelineBinding
+import com.practice.astra.repository.TicketRepository
 import com.practice.astra.ui.ticket.RecyclerAdapter
 
 class TimelineFragment : BaseTicketListFragment() {
@@ -24,6 +25,10 @@ class TimelineFragment : BaseTicketListFragment() {
         val action = TimelineFragmentDirections
             .actionNavigationTimelineToTicketDetailTab(ticket.id)
         findNavController().navigate(action)
+    }
+
+    override fun onBookmarkClicked(ticket: TicketData) {
+        viewModel.toggleBookmark(ticket.id)
     }
 
     override fun onCreateView(

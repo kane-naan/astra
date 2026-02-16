@@ -29,6 +29,10 @@ class OrganizationInformationFragment : BaseTicketListFragment() {
             .navigate(R.id.ticketDetailTabFragment, bundle)
     }
 
+    override fun onBookmarkClicked(ticket: TicketData) {
+        viewModel.toggleBookmark(ticket.id)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

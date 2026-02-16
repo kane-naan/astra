@@ -9,20 +9,21 @@ import com.practice.astra.data.TicketData
 import java.util.ArrayList
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.navigation.fragment.findNavController
-import com.practice.astra.R
 import com.practice.astra.util.ListUtils
 
 /**
  * チケット抽象基底クラス
- * チケットを表示する際にこのFragmentを継承する
- *
- * */
+ */
 abstract class BaseTicketListFragment : Fragment() {
+
+    // --- 継承先（BookmarkedTicketsFragmentなど）で実装する ---
+    protected abstract fun onTicketClicked(ticket: TicketData)
+    protected abstract fun onBookmarkClicked(ticket: TicketData)
+
     private fun setupRecyclerView(
         recyclerView: RecyclerView,
         listData: List<TicketData>,
-        onItemClick:(TicketData) -> Unit
+        onItemClick: (TicketData) -> Unit
     ): RecyclerAdapter {
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
@@ -32,16 +33,11 @@ abstract class BaseTicketListFragment : Fragment() {
             onItemClick = onItemClick,
             onBookmarkClick = { clickedTicket ->
                 handleBookmarkToggleAndNotify(clickedTicket, adapter, listData)
+                onBookmarkClicked(clickedTicket)
             }
         )
         recyclerView.adapter = adapter
         return adapter
-    }
-
-    protected abstract fun onTicketClicked(ticket: TicketData)
-
-    protected fun commonHandleItemClick(data: TicketData){
-        onTicketClicked(data)
     }
 
     private fun handleBookmarkToggleAndNotify(
@@ -77,7 +73,7 @@ abstract class BaseTicketListFragment : Fragment() {
                 listData = list,
                 onItemClick = { ticket ->
                     Log.d("DEBUG", "BaseTicketList: クリック検知 ${ticket.id}")
-                    commonHandleItemClick(ticket)
+                    onTicketClicked(ticket)
                 }
             )
         }

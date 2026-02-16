@@ -46,4 +46,8 @@ class PurchasedTicketsFragment : BaseTicketListFragment() {
             .actionNavigationDashboardToTicketDetailTab(ticket.id)
         requireActivity().findNavController(R.id.nav_host_fragment_activity_main).navigate(action)
     }
+
+    override fun onBookmarkClicked(ticket: TicketData) {
+        viewModel.toggleBookmark(ticket.id)
+    }
 }
