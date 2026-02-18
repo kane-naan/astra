@@ -1,13 +1,14 @@
 package com.practice.astra.data
 
 data class User(
-    val name: String,
-    val message: String,
-    val header: Int,
-    val icon: Int,
-    val recommend: List<String>, // チケットのタイトル
-    val distribution: List<TicketData>,
-    val writing: List<Review>,
-    var follower: Int,
-    var following: Int
+    val name: String = "",
+    val message: String = "",
+    val header: Int = 0,
+    val icon: Int = 0,
+    val recommend: List<String> = emptyList(),
+    val distribution: List<TicketData> = emptyList(),
+    val writing: List<String> = emptyList(),
+    var follower: List<String> = emptyList(),
+    var following: List<String> = emptyList(),
+    val bookmark: List<String> = emptyList(),
 )

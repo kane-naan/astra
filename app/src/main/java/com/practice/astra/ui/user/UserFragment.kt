@@ -29,7 +29,7 @@ class UserFragment : BaseTicketListFragment() {
     }
 
     override fun onBookmarkClicked(ticket: TicketData) {
-
+        viewModel.toggleBookmark(ticket.id)
     }
 
     override fun onCreateView(
@@ -49,8 +49,15 @@ class UserFragment : BaseTicketListFragment() {
 
     // 監視
     private fun setupObservers() {
+        viewModel.userData.observe(viewLifecycleOwner) { user ->
+            binding.apply {
+                textName.text="${user.name}"
+                textMessage.text="${user.message}"
+                textFollowing.text = "フォロー中 ${user.following.size}"
+                textFollower.text = "フォロワー ${user.follower.size}"
+            }
+        }
         observeAndSync(viewModel.recommendedTickets, binding.recyclerViewRecommended)
-        observeAndSync(viewModel.reviews, binding.recyclerViewWriting)
     }
 
     // フォロー・フォロワー一覧への遷移
@@ -58,7 +65,6 @@ class UserFragment : BaseTicketListFragment() {
         binding.textFollowing.setOnClickListener {
             navigateToFollowList(TAB_INDEX_FOLLOWING)
         }
-
         binding.textFollower.setOnClickListener {
             navigateToFollowList(TAB_INDEX_FOLLOWER)
         }

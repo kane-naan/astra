@@ -1,36 +1,41 @@
 package com.practice.astra.ui.auth.data
 
+import android.util.Log
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.practice.astra.ui.auth.data.model.LoggedInUser
+import kotlinx.coroutines.tasks.await
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 class LoginDataSource {
 
-    private val firebaseAuth = FirebaseAuth.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
-    fun login(username: String, password: String): Result<LoggedInUser> {
+    suspend fun login(username: String, password: String): Result<LoggedInUser> {
         return try {
-            val task = firebaseAuth.signInWithEmailAndPassword(username, password)
-            val result = Tasks.await(task, 10, TimeUnit.SECONDS)
+            val authResult = auth.signInWithEmailAndPassword(username, password).await()
+            val firebaseUser = authResult.user
 
-            val firebaseUser = result.user
             if (firebaseUser != null) {
+                // ログイン成功
                 val user = LoggedInUser(
                     userId = firebaseUser.uid,
-                    displayName = firebaseUser.displayName ?: "ユーザー"
+                    displayName = firebaseUser.email ?: "ユーザー"
                 )
                 Result.Success(user)
             } else {
-                Result.Error(IOException("ユーザー情報の取得に失敗しました"))
+                Result.Error(IOException("ログインに失敗しました"))
             }
-        } catch (e: Exception) {
-            Result.Error(IOException("ログインエラー: ${e.localizedMessage}", e))
+
+        }  catch (e: Exception) {
+        Log.e("AUTH_DEBUG", "エラーの種類: ${e::class.java.simpleName}")
+        Log.e("AUTH_DEBUG", "エラーメッセージ: ${e.message}")
+        Result.Error(IOException("ログインエラー: ${e.localizedMessage}", e))
         }
     }
 
     fun logout() {
-        firebaseAuth.signOut()
+        auth.signOut()
     }
 }

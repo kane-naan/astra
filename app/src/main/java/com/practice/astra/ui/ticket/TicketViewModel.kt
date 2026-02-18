@@ -8,8 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.practice.astra.data.TicketData
 import kotlinx.coroutines.launch
 import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
+import com.practice.astra.repository.TicketRepository
 import kotlinx.coroutines.tasks.await
 
 class TicketViewModel : ViewModel() {
@@ -22,30 +24,25 @@ class TicketViewModel : ViewModel() {
     val bookmarkedTickets: LiveData<List<TicketData>> = _bookmarkedTickets
 
     private val db = FirebaseFirestore.getInstance()
-    private val currentUserId = "test_user_001" // 認証実装前なので固定
+    private val auth = FirebaseAuth.getInstance()
+    private val repository = TicketRepository()
 
+    private val currentUserId: String
+        get() = auth.currentUser?.uid ?: "test_user_001"
 
     fun formatTicketPrice(price: Int?): String {
         return price?.let { "¥$it" } ?: "無料"
     }
 
     fun loadPurchasedTickets() {
-//        val unused = listOf(
-//            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
-//        )
-//        val expired = listOf(
-//            TicketData("001", "どんぐりと山猫", "", "やまねこ高等学校演劇部", "やまねこ高校体育館", 0, listOf("高校生"),false),
-//        )
-//        _purchasedTickets.value = Pair(unused, expired)
     }
 
     fun loadBookmarkedTickets() {
         viewModelScope.launch {
             try {
-                val bookmarkSnapshot = db.collection("users").document(currentUserId)
-                    .collection("bookmarks").get().await()
-
-                val ticketIds = bookmarkSnapshot.documents.map { it.id }
+                val userDoc = db.collection("users").document(currentUserId).get().await()
+                val rawTicketIds = userDoc.get("bookmark") as? List<String> ?: emptyList()
+                val ticketIds = rawTicketIds.filter { it.isNotBlank() }
 
                 if (ticketIds.isEmpty()) {
                     _bookmarkedTickets.postValue(emptyList())
@@ -71,22 +68,14 @@ class TicketViewModel : ViewModel() {
         }
     }
 
+
     fun toggleBookmark(ticketId: String) {
         viewModelScope.launch {
             try {
-                val bookmarkDocRef = db.collection("users").document(currentUserId)
-                    .collection("bookmarks").document(ticketId)
-
-                val doc = bookmarkDocRef.get().await()
-                if (doc.exists()) {
-                    bookmarkDocRef.delete().await()
-                    Log.d("DEBUG_ASTRA", "削除成功")
-                } else {
-                    bookmarkDocRef.set(mapOf("bookmarkedAt" to com.google.firebase.Timestamp.now())).await()
-                    Log.d("DEBUG_ASTRA", "保存成功！")
-                }
+                repository.toggleBookmark(ticketId)
+                loadBookmarkedTickets()
             } catch (e: Exception) {
-                Log.e("DEBUG_ASTRA", "エラー: ${e.message}")
+                Log.e("TicketViewModel", "Bookmark切り替えエラー: ${e.message}")
             }
         }
     }
