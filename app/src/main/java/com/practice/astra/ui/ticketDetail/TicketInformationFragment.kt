@@ -42,8 +42,16 @@ class TicketInformationFragment : Fragment() {
 
                 val icon = if (ticket.isToggled) R.drawable.baseline_bookmark_24 else R.drawable.baseline_bookmark_border_24
                 ticketBookmark.setImageResource(icon)
+                ticketBookmark.setOnClickListener {
+                    viewModel.toggleBookmark(ticket.id)
+                }
             }
         }
+        viewModel.isBookmarked.observe(viewLifecycleOwner) { isBookmarked ->
+            val icon = if (isBookmarked) R.drawable.baseline_bookmark_24 else R.drawable.baseline_bookmark_border_24
+            binding.includeTicketItem.ticketBookmark.setImageResource(icon)
+        }
+
         viewModel.formattedPrice.observe(viewLifecycleOwner) { priceString ->
             binding.textPriceDetail.text = priceString
         }
