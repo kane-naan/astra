@@ -17,7 +17,7 @@ class BookmarkedTicketsFragment : BaseTicketListFragment() {
     private var _binding: FragmentBookmarkedTicketsBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: TicketViewModel by viewModels()
+    private val viewModel: TicketViewModel by viewModels({ requireParentFragment() })
 
     override fun onTicketClicked(ticket: TicketData) {
         android.util.Log.d("DEBUG", "チケットがクリックされました: ${ticket.id}")
@@ -47,6 +47,11 @@ class BookmarkedTicketsFragment : BaseTicketListFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeAndSync(viewModel.bookmarkedTickets, binding.recyclerView)
+        viewModel.loadBookmarkedTickets()
+    }
+
+    override fun onResume() {
+        super.onResume()
         viewModel.loadBookmarkedTickets()
     }
 }

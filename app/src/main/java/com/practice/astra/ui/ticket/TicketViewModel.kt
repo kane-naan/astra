@@ -13,6 +13,9 @@ import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.practice.astra.repository.TicketRepository
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class TicketViewModel : ViewModel() {
 
@@ -35,6 +38,62 @@ class TicketViewModel : ViewModel() {
     }
 
     fun loadPurchasedTickets() {
+        viewModelScope.launch {
+            try {
+                val userDoc = db.collection("users").document(currentUserId).get().await()
+                val rawPurchasedIds = userDoc.get("purchasedTicketIds") as? List<String> ?: emptyList()
+
+                // 空文字や空白を除外
+                val purchasedIds = rawPurchasedIds.filter { it.isNotBlank() }
+
+                if (purchasedIds.isEmpty()) {
+                    _purchasedTickets.postValue(Pair(emptyList(), emptyList()))
+                    return@launch
+                }
+
+                // フィルタリング後の purchasedIds を使用
+                val ticketsSnapshot = db.collection("tickets")
+                    .whereIn(FieldPath.documentId(), purchasedIds)
+                    .get().await()
+
+                val myBookmarks = userDoc.get("bookmark") as? List<String> ?: emptyList()
+
+                val allPurchasedTickets = ticketsSnapshot.documents.mapNotNull { doc ->
+                    doc.toObject(TicketData::class.java)?.copy(
+                        id = doc.id,
+                        isToggled = myBookmarks.contains(doc.id)
+                    )
+                }
+
+                val now = Date()
+                val sdf = SimpleDateFormat("yyyy年MM月dd日 HH:mm", Locale.JAPAN)
+
+                val unused = mutableListOf<TicketData>()
+                val expired = mutableListOf<TicketData>()
+
+                allPurchasedTickets.forEach { ticket ->
+                    try {
+                        val dateString = ticket.event_date.split("～")[0].trim()
+                        val eventDate = sdf.parse(dateString)
+
+                        if (ticket.stockCount > 0 && eventDate != null && eventDate.after(now)) {
+                            unused.add(ticket)
+                        } else {
+                            expired.add(ticket)
+                        }
+                    } catch (e: Exception) {
+                        Log.e("TicketViewModel", "日付解析失敗: ${ticket.event_date}")
+                        expired.add(ticket)
+                    }
+                }
+
+                _purchasedTickets.postValue(Pair(unused, expired))
+
+            } catch (e: Exception) {
+                Log.e("TicketViewModel", "購入済みチケット取得エラー", e)
+                _purchasedTickets.postValue(Pair(emptyList(), emptyList()))
+            }
+        }
     }
 
     fun loadBookmarkedTickets() {
@@ -73,6 +132,7 @@ class TicketViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 repository.toggleBookmark(ticketId)
+                loadPurchasedTickets()
                 loadBookmarkedTickets()
             } catch (e: Exception) {
                 Log.e("TicketViewModel", "Bookmark切り替えエラー: ${e.message}")

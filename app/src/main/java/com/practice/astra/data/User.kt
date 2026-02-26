@@ -11,4 +11,5 @@ data class User(
     var follower: List<String> = emptyList(),
     var following: List<String> = emptyList(),
     val bookmark: List<String> = emptyList(),
+    val purchasedTicketIds: List<String> = emptyList()
 )

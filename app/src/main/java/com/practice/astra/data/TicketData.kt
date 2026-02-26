@@ -14,5 +14,6 @@ data class TicketData(
     val point: String = "",       // 見どころ
     val organizationId: String = "",
     val tags: List<String> = emptyList(),
-    override var isToggled: Boolean = false
+    override var isToggled: Boolean = false,
+    val stockCount: Int = 0
 ) : ToggleableItem

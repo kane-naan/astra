@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.practice.astra.R
@@ -25,13 +27,13 @@ class TicketInformationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // チケット詳細データの表示
         viewModel.selectedTicketDetails.observe(viewLifecycleOwner) { ticket ->
             binding.textContentDetail.text = ticket.description
             binding.textDateDetail.text = ticket.event_date
             binding.textHighlightDetail.text = ticket.point
             binding.textLocationDetail.text = ticket.place
-            binding.includeTicketItem.ticketImage.setImageResource(R.drawable.ticket_image)
-            binding.includeTicketItem.ticketActor.text = ticket.actor
 
             binding.includeTicketItem.apply {
                 ticketTitle.text = ticket.title
@@ -40,20 +42,55 @@ class TicketInformationFragment : Fragment() {
                 ticketPrice.text = ticket.price?.toString() ?: "0"
                 ticketImage.setImageResource(R.drawable.ticket_image)
 
-                val icon = if (ticket.isToggled) R.drawable.baseline_bookmark_24 else R.drawable.baseline_bookmark_border_24
-                ticketBookmark.setImageResource(icon)
+                // ブックマークのクリック
                 ticketBookmark.setOnClickListener {
                     viewModel.toggleBookmark(ticket.id)
                 }
             }
         }
+
+        // 購入済み状態の監視（ボタンのテキストと見た目を変更）
+        viewModel.isPurchased.observe(viewLifecycleOwner) { purchased ->
+            if (purchased) {
+                binding.buttonPurchase.apply {
+                    text = "購入済み"
+                    isEnabled = false
+                    backgroundTintList = ContextCompat.getColorStateList(requireContext(), android.R.color.darker_gray)
+                }
+            } else {
+                binding.buttonPurchase.apply {
+                    text = "購入"
+                    isEnabled = true
+                    backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.blueGray)
+                }
+            }
+        }
+
+        // ブックマークアイコンの状態連動
         viewModel.isBookmarked.observe(viewLifecycleOwner) { isBookmarked ->
             val icon = if (isBookmarked) R.drawable.baseline_bookmark_24 else R.drawable.baseline_bookmark_border_24
             binding.includeTicketItem.ticketBookmark.setImageResource(icon)
         }
 
+        // 価格表示のフォーマット
         viewModel.formattedPrice.observe(viewLifecycleOwner) { priceString ->
             binding.textPriceDetail.text = priceString
+        }
+
+        // 購入ボタンのクリック処理
+        binding.buttonPurchase.setOnClickListener {
+            viewModel.selectedTicketDetails.value?.let { ticket ->
+                viewModel.purchaseTicket(ticket.id)
+            }
+        }
+
+        // 購入結果の通知
+        viewModel.purchaseSuccess.observe(viewLifecycleOwner) { success ->
+            if (success) {
+                Toast.makeText(requireContext(), "チケットを購入しました！", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "購入に失敗しました（在庫切れなど）", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

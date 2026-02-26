@@ -14,7 +14,7 @@ import com.practice.astra.ui.base.BaseTicketListFragment
 class PurchasedTicketsFragment : BaseTicketListFragment() {
     private var _binding: FragmentPurchasedTicketsBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: TicketViewModel by viewModels()
+    private val viewModel: TicketViewModel by viewModels({ requireParentFragment() })
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,5 +49,10 @@ class PurchasedTicketsFragment : BaseTicketListFragment() {
 
     override fun onBookmarkClicked(ticket: TicketData) {
         viewModel.toggleBookmark(ticket.id)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadPurchasedTickets()
     }
 }
