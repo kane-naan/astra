@@ -7,7 +7,7 @@
     android:background="@color/backGroundGray"
     tools:context=".ui.ticketDetail.TicketInformationFragment">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -27,23 +27,19 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingBottom="80dp">
-                <TextView style="@style/DetailSectionTitle" android:text="●内容"
-                    android:textColor="@color/darkGray"/>
+                android:orientation="vertical">
+
+                <TextView style="@style/DetailSectionTitle" android:text="●内容" android:textColor="@color/darkGray"/>
                 <TextView
                     android:id="@+id/text_content_detail"
                     style="@style/DetailSectionBody"
-                    android:textColor="@color/darkGray"
-                    />
+                    android:textColor="@color/darkGray" />
 
-                <TextView style="@style/DetailSectionTitle" android:text="●日時" android:textColor="@color/darkGray"/>
+                <TextView style="@style/DetailSectionTitle" android:text="●公演日" android:textColor="@color/darkGray"/>
                 <TextView
                     android:id="@+id/text_date_detail"
                     style="@style/DetailSectionBody"
-                    android:textColor="@color/darkGray"
-                     />
-
+                    android:textColor="@color/darkGray" />
 
                 <TextView style="@style/DetailSectionTitle" android:text="●チケット代" android:textColor="@color/darkGray"/>
                 <TextView
@@ -51,13 +47,11 @@
                     style="@style/DetailSectionBody"
                     android:textColor="@color/darkGray"/>
 
-
                 <TextView style="@style/DetailSectionTitle" android:text="●場所" android:textColor="@color/darkGray"/>
                 <TextView
                     android:id="@+id/text_location_detail"
                     style="@style/DetailSectionBody"
                     android:textColor="@color/darkGray" />
-
 
                 <TextView style="@style/DetailSectionTitle" android:text="●見どころ" android:textColor="@color/darkGray"/>
                 <TextView
@@ -65,19 +59,32 @@
                     style="@style/DetailSectionBody"
                     android:textColor="@color/darkGray" />
 
+                <Button
+                    android:id="@+id/button_purchase"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginBottom="80dp"
+                    android:text="購入"
+                    android:backgroundTint="@color/blueGray"
+                    android:textColor="@color/white"
+                    android:elevation="4dp" />
+
             </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-    <Button
-        android:id="@+id/button_purchase"
-        android:layout_width="match_parent"
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab_add_review"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
+        android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:text="購入"
-        android:backgroundTint="@color/blueGray"
+        android:text="口コミを書く"
         android:textColor="@color/white"
-        android:elevation="8dp" />
+        app:icon="@drawable/baseline_edit_24"
+        app:iconTint="@color/white"
+        app:backgroundTint="@color/blueGray"
+        app:elevation="8dp" />
 
 </FrameLayout>

@@ -11,81 +11,66 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="16dp">
-
-        <ImageView
-            android:id="@+id/organizationImage"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/organization_image"
-            android:contentDescription="団体イメージ画像" />
-
-        <Button
-            android:id="@+id/button_follow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="-40dp"
-            android:layout_marginEnd="16dp"
-            android:text="フォロー"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/blueGray" />
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@color/white"
-            android:padding="16dp"
-            android:layout_marginTop="-16dp">
+            android:paddingBottom="32dp">
 
-            <TextView
-                android:id="@+id/text_organization_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:text="こんにちは！〇〇高校吹奏楽部です！\n私たちは1年生26名、2年生21名、3年生15名の62名で活動しています！" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="活動予定"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:layout_marginTop="16dp" />
-
-            <TextView
-                android:id="@+id/text_activity_schedule"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="4dp"
-                android:text="5月 東部支部吹奏楽研究発表会\n6月 「定期演奏会」\n8月 道の駅演奏会" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/backGroundGray"
-            android:orientation="vertical"
-            android:layout_marginTop="16dp"
-            android:paddingTop="16dp">
-
-            <View
+            <ImageView
+                android:id="@+id/organizationImage"
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/backGroundGray"
-                android:layout_marginBottom="16dp" />
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/organization_image"
+                android:contentDescription="団体イメージ画像" />
+
+            <Button
+                android:id="@+id/button_follow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="-40dp"
+                android:layout_marginEnd="16dp"
+                android:text="フォロー"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/blueGray" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:padding="16dp"
+                android:layout_marginTop="-16dp">
+
+                <TextView
+                    android:id="@+id/text_organization_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="活動予定"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:layout_marginTop="16dp" />
+
+                <TextView
+                    android:id="@+id/text_activity_schedule"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/textViewTicketListTitle"
@@ -100,21 +85,44 @@
                 android:background="@drawable/text_view_border_background"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
+                android:layout_marginTop="24dp"
                 android:layout_marginBottom="16dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                tools:listitem="@layout/ticket_item" />
+
+            <TextView
+                android:id="@+id/textViewReviewListTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="〜口コミ一覧〜"
+                android:textColor="@color/blueGray"
+                android:textSize="16sp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:gravity="center"
+                android:background="@drawable/text_view_border_background"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="16dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewReviews"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                tools:listitem="@layout/review_item" />
+
         </LinearLayout>
-
-    </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:clipToPadding="false"
-        tools:itemCount="2"
-        tools:listitem="@layout/ticket_item" />
 
 </LinearLayout>

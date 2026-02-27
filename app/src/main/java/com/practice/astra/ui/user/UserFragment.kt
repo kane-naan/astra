@@ -6,13 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.practice.astra.R
 import com.practice.astra.data.TicketData
 import com.practice.astra.databinding.FragmentUserBinding
 import com.practice.astra.ui.base.BaseTicketListFragment
-import com.practice.astra.ui.ticket.RecyclerAdapter
-import com.practice.astra.ui.timeline.TimelineFragmentDirections
+import com.practice.astra.ui.ticketDetail.ReviewAdapter
 
+// 定数の定義
 const val ARG_INITIAL_TAB = "initial_tab_index"
 const val TAB_INDEX_FOLLOWING = 0
 const val TAB_INDEX_FOLLOWER = 1
@@ -22,7 +23,13 @@ class UserFragment : BaseTicketListFragment() {
     private var _binding: FragmentUserBinding? = null
     private val binding get() = _binding!!
 
+    // ViewModelの取得
     private val viewModel: UserViewModel by viewModels()
+
+    // アダプターをクラスプロパティとして定義
+    private val reviewAdapter = ReviewAdapter()
+
+    // BaseTicketListFragmentから継承した機能
     override fun onTicketClicked(ticket: TicketData) {
         val action = UserFragmentDirections.actionUserToTicketDetailTab(ticket.id)
         findNavController().navigate(action)
@@ -42,22 +49,62 @@ class UserFragment : BaseTicketListFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // RecyclerViewの初期設定を一度だけ行う
+        setupRecyclerView()
+
+        // データの監視を開始
         setupObservers()
+
+        // クリックリスナーの設定
         setupClickListeners()
+
+        // データ取得の開始
         viewModel.loadUserData()
     }
 
-    // 監視
+    private fun setupRecyclerView() {
+        binding.recyclerViewWriting.apply {
+            adapter = reviewAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+            isNestedScrollingEnabled = false
+            setHasFixedSize(false) // 中身の量に合わせて高さを変える
+        }
+
+        binding.recyclerViewRecommended.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            isNestedScrollingEnabled = false
+            setHasFixedSize(false)
+        }
+    }
+
     private fun setupObservers() {
+        // プロフィールデータの監視
         viewModel.userData.observe(viewLifecycleOwner) { user ->
             binding.apply {
-                textName.text="${user.name}"
-                textMessage.text="${user.message}"
+                textName.text = user.name
+                textMessage.text = user.message
                 textFollowing.text = "フォロー中 ${user.following.size}"
                 textFollower.text = "フォロワー ${user.follower.size}"
             }
+            viewModel.myReviews.observe(viewLifecycleOwner) { reviews ->
+                android.util.Log.d("DEBUG", "UserFragment - 取得した口コミ数: ${reviews.size}")
+                reviewAdapter.submitList(reviews)
+                binding.recyclerViewWriting.requestLayout()
+            }
         }
+
+        // おすすめチケット一覧の同期
         observeAndSync(viewModel.recommendedTickets, binding.recyclerViewRecommended)
+
+        // 自分の口コミ一覧の監視
+        viewModel.myReviews.observe(viewLifecycleOwner) { reviews ->
+            // データの件数をログに出力して確認
+            android.util.Log.d("DEBUG", "UserFragment - 取得した口コミ数: ${reviews.size}")
+
+            // アダプターにデータを渡す
+            reviewAdapter.submitList(reviews)
+        }
     }
 
     // フォロー・フォロワー一覧への遷移

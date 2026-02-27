@@ -18,6 +18,10 @@ class UserViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
+    // LiveDataの追加
+    private val _myReviews = MutableLiveData<List<com.practice.astra.data.ReviewData>>()
+    val myReviews: LiveData<List<com.practice.astra.data.ReviewData>> = _myReviews
+
     private val _userData = MutableLiveData<User>()
     val userData: LiveData<User> = _userData
 
@@ -37,15 +41,17 @@ class UserViewModel : ViewModel() {
                     if (user != null) {
                         _userData.postValue(user)
 
+                        // おすすめチケットの取得
                         if (user.recommend.isNotEmpty()) {
                             fetchTicketsByIds(user.recommend, user.bookmark)
                         } else {
                             _recommendedTickets.postValue(emptyList())
                         }
+                        loadMyReviews(currentUser.uid)
                     }
                 }
             } catch (e: Exception) {
-                Log.e("UserViewModel", "ユーザーデータまたはチケット取得失敗", e)
+                Log.e("UserViewModel", "ユーザーデータ取得失敗", e)
             }
         }
     }
@@ -81,6 +87,24 @@ class UserViewModel : ViewModel() {
                 loadUserData()
             } catch (e: Exception) {
                 Log.e("TimelineViewModel", "リポジトリ呼び出し失敗", e)
+            }
+        }
+    }
+
+    private fun loadMyReviews(userId: String) {
+        viewModelScope.launch {
+            try {
+                val snapshot = db.collection("reviews")
+                    .whereEqualTo("userId", userId)
+                    .get()
+                    .await()
+
+                val reviews = snapshot.documents.mapNotNull { doc ->
+                    doc.toObject(com.practice.astra.data.ReviewData::class.java)
+                }
+                _myReviews.postValue(reviews)
+            } catch (e: Exception) {
+                Log.e("UserViewModel", "口コミ取得失敗", e)
             }
         }
     }

@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
-import com.practice.astra.R
 import com.practice.astra.data.OrganizationData
+import com.practice.astra.data.ReviewData
 import com.practice.astra.data.TicketData
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -35,6 +35,9 @@ class TicketDetailViewModel : ViewModel() {
 
     private val _purchaseSuccess = MutableLiveData<Boolean>()
     val purchaseSuccess: LiveData<Boolean> = _purchaseSuccess
+
+    private val _postReviewSuccess = MutableLiveData<Boolean>()
+    val postReviewSuccess: LiveData<Boolean> = _postReviewSuccess
 
     val formattedPrice: LiveData<String> = _selectedTicketDetails.map { ticket ->
         if (ticket.price == 0 || ticket.price == null) "無料" else "¥${ticket.price}"
@@ -65,6 +68,7 @@ class TicketDetailViewModel : ViewModel() {
                         _selectedTicketDetails.value = it
                         loadOrganizationInfo(it.organizationId)
                         loadOrganizationTickets(it.organizationId)
+                        loadOrganizationReviews(it.organizationId)
                         checkBookmarkStatus(it.id)
                     }
                 } else {
@@ -80,6 +84,11 @@ class TicketDetailViewModel : ViewModel() {
     val organizationDetail: LiveData<OrganizationData> = _organizationDetail
 
     fun loadOrganizationInfo(organizationId: String) {
+        if (organizationId.isEmpty()) {
+            Log.e("TicketDetailViewModel", "団体IDが空のため、情報取得をスキップします")
+            return
+        }
+
         viewModelScope.launch {
             try {
                 val doc = db.collection("organizations").document(organizationId).get().await()
@@ -93,15 +102,36 @@ class TicketDetailViewModel : ViewModel() {
     }
 
     fun loadOrganizationTickets(organizationId: String) {
+        if (organizationId.isEmpty()) {
+            Log.e("DEBUG", "loadOrganizationTickets: organizationId is empty")
+            return
+        }
+
+        val uid = currentUserId
+        if (uid.isEmpty()) {
+            Log.e("DEBUG", "loadOrganizationTickets: userId is empty (Auth status error)")
+        }
+
         viewModelScope.launch {
             try {
-                val userDoc = db.collection("users").document(currentUserId).get().await()
+                // ユーザー情報取得を待機
+                val userDoc = db.collection("users").document(uid).get().await()
                 val myBookmarks = userDoc.get("bookmark") as? List<String> ?: emptyList()
-                val snapshot = db.collection("tickets").whereEqualTo("organizationId", organizationId).get().await()
+
+                val snapshot = db.collection("tickets")
+                    .whereEqualTo("organizationId", organizationId)
+                    .get()
+                    .await()
+
                 val tickets = snapshot.documents.mapNotNull { doc ->
-                    doc.toObject(TicketData::class.java)?.copy(id = doc.id, isToggled = myBookmarks.contains(doc.id))
+                    doc.toObject(TicketData::class.java)?.copy(
+                        id = doc.id,
+                        isToggled = myBookmarks.contains(doc.id)
+                    )
                 }
-                _organizationTickets.value = tickets
+
+                Log.d("DEBUG", "取得したチケット数: ${tickets.size}")
+                _organizationTickets.postValue(tickets)
             } catch (e: Exception) {
                 Log.e("TicketDetailViewModel", "団体チケット取得エラー", e)
             }
@@ -172,12 +202,67 @@ class TicketDetailViewModel : ViewModel() {
                 _isPurchased.postValue(true)
                 _purchaseSuccess.postValue(true)
 
-                // 最新の情報を再読み込み（在庫数などを反映）
+                // 最新の情報を再読み込み
                 loadTicketDetails(ticketId)
 
             } catch (e: Exception) {
                 Log.e("PURCHASE", "購入失敗: ${e.message}")
                 _purchaseSuccess.postValue(false)
+            }
+        }
+    }
+
+    fun postReview(rating: Float, title: String, comment: String) {
+        val ticket = selectedTicketDetails.value ?: return
+        val userId = auth.currentUser?.uid ?: "test_user_001"
+
+        val userName = auth.currentUser?.displayName ?: "匿名ユーザー"
+        val userIconUrl = auth.currentUser?.photoUrl?.toString() ?: ""
+
+        val review = ReviewData(
+            id = "",
+            ticketId = ticket.id,
+            organizationId = ticket.organizationId,
+            userId = userId,
+            userName = userName,
+            userIconUrl = userIconUrl,
+            rating = rating,
+            title = title,
+            comment = comment,
+            createdAt = com.google.firebase.Timestamp.now()
+        )
+
+        viewModelScope.launch {
+            try {
+                val docRef = db.collection("reviews").document()
+                val finalReview = review.copy(id = docRef.id)
+                docRef.set(finalReview).await()
+                _postReviewSuccess.postValue(true)
+            } catch (e: Exception) {
+                Log.e("TicketDetailViewModel", "口コミ投稿エラー", e)
+                _postReviewSuccess.postValue(false)
+            }
+        }
+    }
+
+    private val _organizationReviews = MutableLiveData<List<ReviewData>>()
+    val organizationReviews: LiveData<List<ReviewData>> = _organizationReviews
+
+    fun loadOrganizationReviews(organizationId: String) {
+        viewModelScope.launch {
+            try {
+                val snapshot = db.collection("reviews")
+                    .whereEqualTo("organizationId", organizationId)
+                    .get()
+                    .await()
+
+                val reviews = snapshot.documents.mapNotNull { doc ->
+                    doc.toObject(ReviewData::class.java)
+                }.sortedByDescending { it.createdAt } // 本来はクエリのorderByで行うのが理想的
+
+                _organizationReviews.postValue(reviews)
+            } catch (e: Exception) {
+                Log.e("TicketDetailViewModel", "口コミ取得失敗", e)
             }
         }
     }

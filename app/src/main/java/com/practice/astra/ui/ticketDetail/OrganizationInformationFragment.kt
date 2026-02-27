@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.practice.astra.R
 import com.practice.astra.data.TicketData
 import com.practice.astra.databinding.FragmentOrganizationInformationBinding
@@ -45,9 +46,22 @@ class OrganizationInformationFragment : BaseTicketListFragment() {
         super.onViewCreated(view, savedInstanceState)
         observeAndSync(viewModel.organizationTickets, binding.recyclerView)
 
+        // 口コミ一覧のセットアップ
+        val reviewAdapter = ReviewAdapter()
+        binding.recyclerViewReviews.apply {
+            adapter = reviewAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+            isNestedScrollingEnabled = false
+        }
+
         viewModel.organizationDetail.observe(viewLifecycleOwner) { org ->
             binding.textOrganizationDescription.text = org.description
             binding.textActivitySchedule.text = org.schedule
+        }
+
+        // 口コミデータの監視と更新
+        viewModel.organizationReviews.observe(viewLifecycleOwner) { reviews ->
+            reviewAdapter.submitList(reviews)
         }
     }
 

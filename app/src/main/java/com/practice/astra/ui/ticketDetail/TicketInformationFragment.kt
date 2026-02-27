@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.practice.astra.R
+import com.practice.astra.databinding.DialogAddReviewBinding
 import com.practice.astra.databinding.FragmentTicketInformationBinding
 
 class TicketInformationFragment : Fragment() {
@@ -92,10 +93,39 @@ class TicketInformationFragment : Fragment() {
                 Toast.makeText(requireContext(), "購入に失敗しました（在庫切れなど）", Toast.LENGTH_SHORT).show()
             }
         }
+
+
+        binding.fabAddReview.setOnClickListener {
+            showAddReviewDialog()
+        }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun showAddReviewDialog() {
+        val dialogBinding = DialogAddReviewBinding.inflate(layoutInflater)
+        val dialog = android.app.AlertDialog.Builder(requireContext())
+            .setView(dialogBinding.root)
+            .create()
+
+        dialogBinding.buttonSubmit.setOnClickListener {
+            val rating = dialogBinding.editRating.rating
+            val title = dialogBinding.editReviewTitle.text.toString()
+            val comment = dialogBinding.editReviewComment.text.toString()
+
+            if (title.isNotEmpty() && comment.isNotEmpty()) {
+                viewModel.postReview(rating, title, comment)
+                dialog.dismiss()
+            } else {
+                Toast.makeText(requireContext(), "タイトルと本文を入力してください", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        dialogBinding.buttonCancel.setOnClickListener { dialog.dismiss() }
+        dialog.show()
     }
 }
