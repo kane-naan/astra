@@ -38,4 +38,16 @@
         <item name="android:layout_marginBottom">4dp</item>
     </style>
 
+    <style name="CustomTicketTag" parent="Widget.MaterialComponents.Chip.Action">
+        <item name="chipBackgroundColor">@android:color/white</item>
+        <item name="android:textColor">@color/blueGray</item>
+        <item name="chipStrokeColor">@color/blueGray</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="shapeAppearanceOverlay">@style/RoundedTag</item>
+    </style>
+
+    <style name="RoundedTag">
+        <item name="cornerSize">50dp</item>
+    </style>
+
 </resources>

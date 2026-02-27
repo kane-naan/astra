@@ -11,7 +11,6 @@ import com.practice.astra.R
 import com.practice.astra.data.TicketData
 import com.practice.astra.databinding.FragmentTimelineBinding
 import com.practice.astra.repository.TicketRepository
-import com.practice.astra.ui.ticket.RecyclerAdapter
 
 class TimelineFragment : BaseTicketListFragment() {
 
@@ -20,7 +19,10 @@ class TimelineFragment : BaseTicketListFragment() {
 
     private val viewModel: TimelineViewModel by viewModels()
 
+    private lateinit var unifiedAdapter: UnifiedListAdapter
+
     private val TAG = "TimelineFragment"
+
     override fun onTicketClicked(ticket: TicketData) {
         val action = TimelineFragmentDirections
             .actionNavigationTimelineToTicketDetailTab(ticket.id)
@@ -47,7 +49,34 @@ class TimelineFragment : BaseTicketListFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        observeAndSync(viewModel.timelineTickets, binding.recyclerView)
+
+        setupAdapter()
+        viewModel.timelineItems.observe(viewLifecycleOwner) { items ->
+            unifiedAdapter.submitList(items)
+        }
+
         viewModel.loadTimeline()
+    }
+
+    // アダプターの初期化とRecyclerViewへの設定
+    private fun setupAdapter() {
+        unifiedAdapter = UnifiedListAdapter(
+            onTicketClicked = { ticket ->
+                // チケットクリック時の処理
+                val action = TimelineFragmentDirections
+                    .actionNavigationTimelineToTicketDetailTab(ticket.id)
+                findNavController().navigate(action)
+            },
+            onBookmarkClicked = { ticket ->
+                // ブックマーク処理
+                viewModel.toggleBookmark(ticket.id)
+            },
+            onReviewClicked = { review ->
+                // 口コミクリック時の処理
+            }
+        )
+
+        // RecyclerViewに新しいアダプターを設定
+        binding.recyclerView.adapter = unifiedAdapter
     }
 }
