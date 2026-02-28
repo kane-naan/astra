@@ -13,13 +13,21 @@ class UserViewHolder(val binding: UserListItemBinding) : RecyclerView.ViewHolder
         binding.userName.text = data.userName
         binding.userMessage.text = data.message
 
-        // フォロー状態に応じてボタンのテキストとスタイルを切り替える
+        val backgroundDrawable = binding.followButton.background.mutate()
+
         if (data.isToggled) {
             binding.followButton.text = "フォロー中"
-            binding.followButton.setTextColor(binding.root.context.getColor(R.color.blueGray))
+            binding.followButton.setTextColor(binding.root.context.getColor(R.color.white))
+            if (backgroundDrawable is android.graphics.drawable.GradientDrawable) {
+                backgroundDrawable.setColor(binding.root.context.getColor(R.color.blueGray))
+            }
         } else {
             binding.followButton.text = "フォロー"
-            binding.followButton.setTextColor(binding.root.context.getColor(R.color.white))
+            binding.followButton.setTextColor(binding.root.context.getColor(R.color.blueGray))
+
+            if (backgroundDrawable is android.graphics.drawable.GradientDrawable) {
+                backgroundDrawable.setColor(binding.root.context.getColor(R.color.white))
+            }
         }
     }
 }

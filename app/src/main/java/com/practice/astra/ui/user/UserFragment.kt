@@ -13,6 +13,7 @@ import com.practice.astra.databinding.FragmentUserBinding
 import com.practice.astra.ui.base.BaseTicketListFragment
 import com.practice.astra.ui.ticketDetail.ReviewAdapter
 
+
 // 定数の定義
 const val ARG_INITIAL_TAB = "initial_tab_index"
 const val TAB_INDEX_FOLLOWING = 0
@@ -59,6 +60,10 @@ class UserFragment : BaseTicketListFragment() {
         // クリックリスナーの設定
         setupClickListeners()
 
+        arguments?.getString("userId")?.let { userId ->
+            viewModel.setTargetUserId(userId)
+        }
+
         // データ取得の開始
         viewModel.loadUserData()
     }
@@ -79,6 +84,10 @@ class UserFragment : BaseTicketListFragment() {
     }
 
     private fun setupObservers() {
+        viewModel.isMyProfile.observe(viewLifecycleOwner) { isMyProfile ->
+            binding.buttonFollow.visibility = if (isMyProfile) View.GONE else View.VISIBLE
+        }
+
         // プロフィールデータの監視
         viewModel.userData.observe(viewLifecycleOwner) { user ->
             binding.apply {

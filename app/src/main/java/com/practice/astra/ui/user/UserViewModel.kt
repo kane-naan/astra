@@ -18,7 +18,6 @@ class UserViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
-    // LiveDataの追加
     private val _myReviews = MutableLiveData<List<com.practice.astra.data.ReviewData>>()
     val myReviews: LiveData<List<com.practice.astra.data.ReviewData>> = _myReviews
 
@@ -28,26 +27,41 @@ class UserViewModel : ViewModel() {
     private val _recommendedTickets = MutableLiveData<List<TicketData>>()
     val recommendedTickets: LiveData<List<TicketData>> = _recommendedTickets
 
+    private val _isMyProfile = MutableLiveData<Boolean>()
+    val isMyProfile: LiveData<Boolean> = _isMyProfile
+
     private val repository = TicketRepository()
 
+    // 遷移先のユーザーIDを保持
+    private var targetUserId: String? = null
+
+    fun setTargetUserId(userId: String?) {
+        this.targetUserId = userId
+    }
+
     fun loadUserData() {
-        val currentUser = auth.currentUser ?: return
+        val currentUid = auth.currentUser?.uid ?: return
+        val userIdToFetch = targetUserId ?: currentUid
 
         viewModelScope.launch {
             try {
-                val doc = db.collection("users").document(currentUser.uid).get().await()
+                // ★修正：userIdToFetchを使ってデータを取得する
+                val doc = db.collection("users").document(userIdToFetch).get().await()
                 if (doc.exists()) {
                     val user = doc.toObject(User::class.java)
                     if (user != null) {
                         _userData.postValue(user)
 
+                        _isMyProfile.postValue(userIdToFetch == currentUid)
+
                         // おすすめチケットの取得
                         if (user.recommend.isNotEmpty()) {
+                            // ユーザーのブックマーク情報を渡す必要がある
                             fetchTicketsByIds(user.recommend, user.bookmark)
                         } else {
                             _recommendedTickets.postValue(emptyList())
                         }
-                        loadMyReviews(currentUser.uid)
+                        loadMyReviews(userIdToFetch)
                     }
                 }
             } catch (e: Exception) {
@@ -70,6 +84,7 @@ class UserViewModel : ViewModel() {
                 val ticket = doc.toObject(TicketData::class.java)
                 ticket?.copy(
                     id = doc.id,
+                    // ★修正：渡された myBookmarks を使用
                     isToggled = myBookmarks.contains(doc.id)
                 )
             }
@@ -83,10 +98,10 @@ class UserViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 repository.toggleBookmark(ticketId)
-                Log.d("TimelineViewModel", "リポジトリ経由で保存/削除に成功: $ticketId")
+                Log.d("UserViewModel", "リポジトリ経由で保存/削除に成功: $ticketId")
                 loadUserData()
             } catch (e: Exception) {
-                Log.e("TimelineViewModel", "リポジトリ呼び出し失敗", e)
+                Log.e("UserViewModel", "リポジトリ呼び出し失敗", e)
             }
         }
     }

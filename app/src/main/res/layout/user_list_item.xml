@@ -45,16 +45,20 @@
         app:layout_constraintEnd_toStartOf="@+id/followButton"
         tools:text="演出家 ■お仕事の依頼->aaa@aa.com" />
 
-    <Button
+\
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/followButton"
         android:layout_width="wrap_content"
         android:layout_height="36dp"
-        android:layout_marginStart="8dp"
+        android:text="フォロー"
         android:textSize="14sp"
+        android:background="@drawable/text_view_border_background"
+        android:backgroundTint="@null"
+        android:textColor="@color/blueGray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:text="フォロー中" />
+        />
 
     <View
         android:layout_width="0dp"

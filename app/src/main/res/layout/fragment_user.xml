@@ -83,16 +83,15 @@
                         android:textColor="@color/blueGray" />
                 </LinearLayout>
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/button_follow"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
                     android:text="フォロー"
                     android:textSize="14sp"
-                    android:backgroundTint="@color/white"
-                    android:textColor="@color/blueGray"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="@color/blueGray" />
+                    android:background="@drawable/text_view_border_background"
+                    android:backgroundTint="@null"
+                    android:textColor="@color/blueGray" />
             </LinearLayout>
 
             <LinearLayout

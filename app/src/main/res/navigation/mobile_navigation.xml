@@ -48,9 +48,11 @@
         android:name="com.practice.astra.ui.user.UserFragment"
         android:label="@string/title_user"
         tools:layout="@layout/fragment_user" >
+
         <action
             android:id="@+id/action_user_to_ticketDetailTab"
             app:destination="@id/ticketDetailTabFragment" />
+
     </fragment>
 
     <fragment
@@ -63,6 +65,11 @@
             android:name="initial_tab_index"
             app:argType="integer"
             android:defaultValue="0" />
+
+        <action
+            android:id="@+id/actionToUserFragment"
+            app:destination="@id/navigation_user">
+        </action>
 
     </fragment>
 
