@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
     id("androidx.navigation.safeargs.kotlin")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -39,6 +40,9 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    secrets {
+        defaultPropertiesFileName = "secrets.properties"
+    }
 }
 
 dependencies {
@@ -66,5 +70,14 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
     implementation("com.google.firebase:firebase-auth-ktx")
 
+    // map
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
 
+}
+
+tasks.register("checkMapApiKey") {
+    doLast {
+        val apiKey = project.properties["MAPS_API_KEY"]?.toString()
+        println("ecrets-gradle-plugin -> $apiKey")
+    }
 }

@@ -17,3 +17,9 @@ local.properties
 
 # Firebase configuration file
 google-services.json
+
+secrets.properties
+
+my.txt
+
+AndroidManifest.xml
