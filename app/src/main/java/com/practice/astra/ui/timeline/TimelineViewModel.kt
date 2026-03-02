@@ -25,6 +25,14 @@ class TimelineViewModel : ViewModel() {
     private val _timelineItems = MutableLiveData<List<TimelineItem>>()
     val timelineItems: LiveData<List<TimelineItem>> = _timelineItems
 
+    // 検索クエリを保持するLiveData
+    private val _searchQuery = MutableLiveData<String>("")
+    val searchQuery: LiveData<String> = _searchQuery
+
+    // フィルタリングされたアイテムを保持するLiveData
+    private val _filteredTimelineItems = MutableLiveData<List<TimelineItem>>()
+    val filteredTimelineItems: LiveData<List<TimelineItem>> = _filteredTimelineItems
+
     val reviewItems: LiveData<List<TimelineItem.Review>> = _timelineItems.map { items ->
         items.filterIsInstance<TimelineItem.Review>()
     }
@@ -87,8 +95,11 @@ class TimelineViewModel : ViewModel() {
 
                 Log.d("TimelineViewModel", "最終統合データ数: ${combinedList.size}")
 
+                _timelineItems.value = combinedList
+
                 // LiveDataに通知
-                _timelineItems.value = combinedList // メインスレッドでの実行なのでvalueでOK
+//                _timelineItems.value = combinedList // メインスレッドでの実行なのでvalueでOK
+                filterItems(combinedList, _searchQuery.value ?: "")
 
             } catch (e: Exception) {
                 Log.e("TimelineViewModel", "致命的な読み込みエラー", e)
@@ -105,5 +116,36 @@ class TimelineViewModel : ViewModel() {
                 Log.e("TimelineViewModel", "ブックマーク切り替え失敗", e)
             }
         }
+    }
+
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
+        // 既存のデータを使って再フィルタリング
+        val currentItems = _timelineItems.value ?: emptyList()
+        filterItems(currentItems, query)
+    }
+
+    private fun filterItems(items: List<TimelineItem>, query: String) {
+        if (query.isBlank()) {
+            _filteredTimelineItems.value = items
+            return
+        }
+
+        val lowerCaseQuery = query.lowercase()
+        val filteredList = items.filter { item ->
+            when (item) {
+                is TimelineItem.Ticket -> {
+                    item.data.title.lowercase().contains(lowerCaseQuery) ||
+                            item.data.actor.lowercase().contains(lowerCaseQuery) ||
+                            item.data.place.lowercase().contains(lowerCaseQuery)
+                }
+                is TimelineItem.Review -> {
+                    item.data.title.lowercase().contains(lowerCaseQuery) ||
+                            item.data.comment.lowercase().contains(lowerCaseQuery) ||
+                            item.data.userName.lowercase().contains(lowerCaseQuery)
+                }
+            }
+        }
+        _filteredTimelineItems.value = filteredList
     }
 }

@@ -51,9 +51,21 @@ class TimelineFragment : BaseTicketListFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupAdapter()
-        viewModel.timelineItems.observe(viewLifecycleOwner) { items ->
+        viewModel.filteredTimelineItems.observe(viewLifecycleOwner) { items ->
             unifiedAdapter.submitList(items)
         }
+        binding.search.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                // キーボードの検索ボタンが押された時の処理（必要であれば）
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // 文字が入力されるたびにフィルタリングを依頼
+                viewModel.setSearchQuery(newText ?: "")
+                return true
+            }
+        })
 
         viewModel.loadTimeline()
     }
