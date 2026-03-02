@@ -8,16 +8,29 @@ import androidx.recyclerview.widget.RecyclerView
 import com.practice.astra.data.ReviewData
 import com.practice.astra.databinding.ReviewItemBinding
 
-class ReviewAdapter : ListAdapter<ReviewData, ReviewAdapter.ReviewViewHolder>(DiffCallback) {
+/**
+ * 口コミ一覧用のアダプター
+ * @param onReviewClick アイテムクリック時に呼び出されるコールバック。引数はReviewData全体。
+ */
+class ReviewAdapter(
+    private val onReviewClick: (ReviewData) -> Unit
+) : ListAdapter<ReviewData, ReviewAdapter.ReviewViewHolder>(DiffCallback) {
 
-    class ReviewViewHolder(private val binding: ReviewItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    class ReviewViewHolder(
+        private val binding: ReviewItemBinding,
+        private val onReviewClick: (ReviewData) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
+
         fun bind(review: ReviewData) {
             binding.userName.text = review.userName
             binding.reviewTitle.text = review.title
             binding.reviewText.text = review.comment
             binding.reviewRating.rating = review.rating
             binding.likeCount.text = review.likeCount.toString()
+
+            binding.root.setOnClickListener {
+                onReviewClick(review)
+            }
         }
     }
 
@@ -27,7 +40,7 @@ class ReviewAdapter : ListAdapter<ReviewData, ReviewAdapter.ReviewViewHolder>(Di
             parent,
             false
         )
-        return ReviewViewHolder(binding)
+        return ReviewViewHolder(binding, onReviewClick)
     }
 
     override fun onBindViewHolder(holder: ReviewViewHolder, position: Int) {

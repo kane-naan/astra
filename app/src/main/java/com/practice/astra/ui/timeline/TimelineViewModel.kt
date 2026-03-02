@@ -25,6 +25,11 @@ class TimelineViewModel : ViewModel() {
     private val _timelineItems = MutableLiveData<List<TimelineItem>>()
     val timelineItems: LiveData<List<TimelineItem>> = _timelineItems
 
+    private var allCombinedItems = listOf<TimelineItem>()
+
+    private val _searchQuery = MutableLiveData<String>("")
+    val searchQuery: LiveData<String> = _searchQuery
+
     val reviewItems: LiveData<List<TimelineItem.Review>> = _timelineItems.map { items ->
         items.filterIsInstance<TimelineItem.Review>()
     }
@@ -33,67 +38,80 @@ class TimelineViewModel : ViewModel() {
         items.filterIsInstance<TimelineItem.Ticket>()
     }
 
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
+        filterTimeline(query) // Firebase再取得ではなくローカルフィルタを実行
+    }
+
     fun loadTimeline() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
         viewModelScope.launch {
             try {
-                Log.d("TimelineViewModel", "--- 取得処理開始 ---")
+                Log.d("TimelineViewModel", "--- Firestoreからデータ全件取得開始 ---")
 
-                // チケットデータの取得
                 val ticketSnapshot = db.collection("tickets")
-                    //.orderBy("timestamp", Query.Direction.DESCENDING)
+                    .orderBy("event_date", Query.Direction.DESCENDING)
                     .get().await()
 
-                Log.d("TimelineViewModel", "チケットSnapshot件数: ${ticketSnapshot.size()}")
-
-                // ユーザーのブックマーク情報を取得
                 val userDoc = db.collection("users").document(uid).get().await()
                 val bookmarkedIds = userDoc.get("bookmark") as? List<String> ?: emptyList()
 
-                // TicketData オブジェクトに変換
-                val tickets = ticketSnapshot.documents.mapNotNull { doc ->
+                val allTickets = ticketSnapshot.documents.mapNotNull { doc ->
                     val ticket = doc.toObject(TicketData::class.java)
-                    if (ticket == null) {
-                        Log.e("TimelineViewModel", "Ticketのマッピングに失敗: ID=${doc.id}")
-                    }
                     ticket?.copy(
                         id = doc.id,
                         isToggled = bookmarkedIds.contains(doc.id)
                     )
                 }
-                Log.d("TimelineViewModel", "マッピング後のチケット数: ${tickets.size}")
 
-                // 口コミデータの取得
                 val reviewSnapshot = db.collection("reviews")
                     .orderBy("createdAt", Query.Direction.DESCENDING)
                     .get().await()
 
-                Log.d("TimelineViewModel", "口コミSnapshot件数: ${reviewSnapshot.size()}")
-
-                // ReviewData オブジェクトに変換
-                val reviews = reviewSnapshot.documents.mapNotNull { doc ->
+                val allReviews = reviewSnapshot.documents.mapNotNull { doc ->
                     val review = doc.toObject(ReviewData::class.java)
-                    if (review == null) {
-                        Log.e("TimelineViewModel", "Reviewのマッピングに失敗: ID=${doc.id}")
-                    }
                     review?.copy(id = doc.id)
                 }
-                Log.d("TimelineViewModel", "マッピング後の口コミ数: ${reviews.size}")
 
-                // データを統合してソート
-                val combinedList = (tickets.map { TimelineItem.Ticket(it) } +
-                        reviews.map { TimelineItem.Review(it) })
+                allCombinedItems = (allTickets.map { TimelineItem.Ticket(it) } +
+                        allReviews.map { TimelineItem.Review(it) })
                     .sortedByDescending { it.getSortingDate() ?: Date(0) }
 
-                Log.d("TimelineViewModel", "最終統合データ数: ${combinedList.size}")
-
-                // LiveDataに通知
-                _timelineItems.value = combinedList // メインスレッドでの実行なのでvalueでOK
+                // 初回読み込み時はフィルタなしで表示
+                filterTimeline(_searchQuery.value ?: "")
 
             } catch (e: Exception) {
                 Log.e("TimelineViewModel", "致命的な読み込みエラー", e)
             }
         }
+    }
+
+    private fun filterTimeline(query: String) {
+        val filteredList = if (query.isBlank()) {
+            allCombinedItems
+        } else {
+            val lowerCaseQuery = query.lowercase()
+            allCombinedItems.filter { item ->
+                when (item) {
+                    is TimelineItem.Ticket -> {
+                        item.data.title.lowercase().contains(lowerCaseQuery) ||
+                                item.data.actor.lowercase().contains(lowerCaseQuery) ||
+                                item.data.place.lowercase().contains(lowerCaseQuery) ||
+                                item.data.tags.any { tag -> tag.lowercase().contains(lowerCaseQuery) }
+                    }
+                    is TimelineItem.Review -> {
+                        // 口コミの検索対象プロパティ
+                        item.data.title.lowercase().contains(lowerCaseQuery) ||
+                                item.data.comment.lowercase().contains(lowerCaseQuery) ||
+                                item.data.userName.lowercase().contains(lowerCaseQuery)
+                    }
+                }
+            }
+        }
+
+        _timelineItems.value = filteredList
+        Log.d("TimelineViewModel", "リアルタイム検索実行: ${filteredList.size}件表示")
     }
 
     fun toggleBookmark(ticketId: String) {

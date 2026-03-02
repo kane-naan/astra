@@ -28,7 +28,11 @@ class UserFragment : BaseTicketListFragment() {
     private val viewModel: UserViewModel by viewModels()
 
     // アダプターをクラスプロパティとして定義
-    private val reviewAdapter = ReviewAdapter()
+    private val reviewAdapter = ReviewAdapter { reviewData ->
+        // クリックされた口コミに紐づく ticketId を使って遷移する
+        val action = UserFragmentDirections.actionUserToTicketDetailTab(reviewData.ticketId)
+        findNavController().navigate(action)
+    }
 
     // BaseTicketListFragmentから継承した機能
     override fun onTicketClicked(ticket: TicketData) {

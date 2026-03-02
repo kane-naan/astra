@@ -214,29 +214,32 @@ class TicketDetailViewModel : ViewModel() {
 
     fun postReview(rating: Float, title: String, comment: String) {
         val ticket = selectedTicketDetails.value ?: return
-        val userId = auth.currentUser?.uid ?: "test_user_001"
-
-        val userName = auth.currentUser?.displayName ?: "匿名ユーザー"
-        val userIconUrl = auth.currentUser?.photoUrl?.toString() ?: ""
-
-        val review = ReviewData(
-            id = "",
-            ticketId = ticket.id,
-            organizationId = ticket.organizationId,
-            userId = userId,
-            userName = userName,
-            userIconUrl = userIconUrl,
-            rating = rating,
-            title = title,
-            comment = comment,
-            createdAt = com.google.firebase.Timestamp.now()
-        )
+        val userId = auth.currentUser?.uid ?: return
 
         viewModelScope.launch {
             try {
+                val userDoc = db.collection("users").document(userId).get().await()
+                val userName = userDoc.getString("name") ?: "名無しさん" // Firestoreのフィールド名に合わせて変更してください
+                val userIconUrl = userDoc.getString("iconUrl") ?: ""
+
+                val review = ReviewData(
+                    id = "",
+                    ticketId = ticket.id,
+                    organizationId = ticket.organizationId,
+                    userId = userId,
+                    userName = userName,
+                    userIconUrl = userIconUrl,
+                    rating = rating,
+                    title = title,
+                    comment = comment,
+                    createdAt = com.google.firebase.Timestamp.now()
+                )
+
+                // 3. 投稿処理
                 val docRef = db.collection("reviews").document()
                 val finalReview = review.copy(id = docRef.id)
                 docRef.set(finalReview).await()
+
                 _postReviewSuccess.postValue(true)
             } catch (e: Exception) {
                 Log.e("TicketDetailViewModel", "口コミ投稿エラー", e)
@@ -258,7 +261,7 @@ class TicketDetailViewModel : ViewModel() {
 
                 val reviews = snapshot.documents.mapNotNull { doc ->
                     doc.toObject(ReviewData::class.java)
-                }.sortedByDescending { it.createdAt } // 本来はクエリのorderByで行うのが理想的
+                }.sortedByDescending { it.createdAt }
 
                 _organizationReviews.postValue(reviews)
             } catch (e: Exception) {

@@ -48,7 +48,9 @@ class UnifiedListAdapter(
             }
             TYPE_REVIEW -> {
                 val binding = ReviewItemBinding.inflate(inflater, parent, false)
-                ReviewAdapter.ReviewViewHolder(binding)
+                ReviewAdapter.ReviewViewHolder(binding) { reviewData ->
+                    onReviewClicked(reviewData)
+                }
             }
             else -> throw IllegalArgumentException("Invalid view type")
         }
@@ -74,9 +76,7 @@ class UnifiedListAdapter(
             is TimelineItem.Review -> {
                 val reviewHolder = holder as ReviewAdapter.ReviewViewHolder
 
-                // 口コミアイテムのバインドとクリック処理
                 reviewHolder.bind(item.data)
-                reviewHolder.itemView.setOnClickListener { onReviewClicked(item.data) }
             }
         }
         Log.d("UnifiedListAdapter", "データバインド: $position, ViewType: ${getItemViewType(position)}")

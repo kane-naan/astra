@@ -5,14 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.practice.astra.R
 import com.practice.astra.data.TicketData
 import com.practice.astra.databinding.FragmentOrganizationInformationBinding
 import com.practice.astra.ui.base.BaseTicketListFragment
-import com.practice.astra.ui.timeline.TimelineFragmentDirections
 
 class OrganizationInformationFragment : BaseTicketListFragment() {
 
@@ -22,12 +19,10 @@ class OrganizationInformationFragment : BaseTicketListFragment() {
 
     override fun onTicketClicked(ticket: TicketData) {
         android.util.Log.d("DEBUG", "団体情報からチケットをクリック: ${ticket.id}")
-        val bundle = Bundle().apply {
-            putString("ticketId", ticket.id)
-        }
-        requireActivity()
-            .findNavController(R.id.nav_host_fragment_activity_main)
-            .navigate(R.id.ticketDetailTabFragment, bundle)
+
+        val action = OrganizationInformationFragmentDirections
+            .actionOrganizationInformationToTicketDetailTab(ticket.id)
+        findNavController().navigate(action)
     }
 
     override fun onBookmarkClicked(ticket: TicketData) {
@@ -46,8 +41,12 @@ class OrganizationInformationFragment : BaseTicketListFragment() {
         super.onViewCreated(view, savedInstanceState)
         observeAndSync(viewModel.organizationTickets, binding.recyclerView)
 
-        // 口コミ一覧のセットアップ
-        val reviewAdapter = ReviewAdapter()
+        val reviewAdapter = ReviewAdapter { reviewData ->
+            val action = OrganizationInformationFragmentDirections
+                .actionOrganizationInformationToTicketDetailTab(reviewData.ticketId)
+            findNavController().navigate(action)
+        }
+
         binding.recyclerViewReviews.apply {
             adapter = reviewAdapter
             layoutManager = LinearLayoutManager(requireContext())
@@ -69,5 +68,4 @@ class OrganizationInformationFragment : BaseTicketListFragment() {
         super.onDestroyView()
         _binding = null
     }
-
 }

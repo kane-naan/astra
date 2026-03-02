@@ -4,13 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.practice.astra.ui.base.BaseTicketListFragment
 import com.practice.astra.R
 import com.practice.astra.data.TicketData
 import com.practice.astra.databinding.FragmentTimelineBinding
-import com.practice.astra.repository.TicketRepository
 
 class TimelineFragment : BaseTicketListFragment() {
 
@@ -51,32 +51,50 @@ class TimelineFragment : BaseTicketListFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupAdapter()
+        setupSearchView()
+
+        // ViewModelからタイムラインアイテムを監視
         viewModel.timelineItems.observe(viewLifecycleOwner) { items ->
             unifiedAdapter.submitList(items)
         }
 
+        // 初回読み込み
         viewModel.loadTimeline()
+    }
+
+    private fun setupSearchView() {
+        binding.search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                // 検索ボタンが押された時はキーボードを隠す
+                binding.search.clearFocus()
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.setSearchQuery(newText ?: "")
+                return true
+            }
+        })
     }
 
     // アダプターの初期化とRecyclerViewへの設定
     private fun setupAdapter() {
         unifiedAdapter = UnifiedListAdapter(
             onTicketClicked = { ticket ->
-                // チケットクリック時の処理
                 val action = TimelineFragmentDirections
                     .actionNavigationTimelineToTicketDetailTab(ticket.id)
                 findNavController().navigate(action)
             },
             onBookmarkClicked = { ticket ->
-                // ブックマーク処理
                 viewModel.toggleBookmark(ticket.id)
             },
             onReviewClicked = { review ->
-                // 口コミクリック時の処理
+                val action = TimelineFragmentDirections
+                    .actionNavigationTimelineToTicketDetailTab(review.ticketId)
+                findNavController().navigate(action)
             }
         )
 
-        // RecyclerViewに新しいアダプターを設定
         binding.recyclerView.adapter = unifiedAdapter
     }
 }
