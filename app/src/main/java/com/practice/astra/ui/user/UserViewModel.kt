@@ -45,7 +45,6 @@ class UserViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                // ★修正：userIdToFetchを使ってデータを取得する
                 val doc = db.collection("users").document(userIdToFetch).get().await()
                 if (doc.exists()) {
                     val user = doc.toObject(User::class.java)
@@ -84,7 +83,6 @@ class UserViewModel : ViewModel() {
                 val ticket = doc.toObject(TicketData::class.java)
                 ticket?.copy(
                     id = doc.id,
-                    // ★修正：渡された myBookmarks を使用
                     isToggled = myBookmarks.contains(doc.id)
                 )
             }

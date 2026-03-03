@@ -1,5 +1,7 @@
 package com.practice.astra.ui.ticketDetail
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.practice.astra.R
+import com.practice.astra.data.TicketData
 import com.practice.astra.databinding.DialogAddReviewBinding
 import com.practice.astra.databinding.FragmentTicketInformationBinding
 
@@ -50,7 +53,22 @@ class TicketInformationFragment : Fragment() {
             }
         }
 
-        // 購入済み状態の監視（ボタンのテキストと見た目を変更）
+
+        // X 共有
+        binding.buttonShareX.setOnClickListener {
+            viewModel.selectedTicketDetails.value?.let { ticket ->
+                shareToX(ticket)
+            }
+        }
+
+        // LINE 共有
+        binding.buttonShareLine.setOnClickListener {
+            viewModel.selectedTicketDetails.value?.let { ticket ->
+                shareToLine(ticket)
+            }
+        }
+
+        // 購入済み状態の監視
         viewModel.isPurchased.observe(viewLifecycleOwner) { purchased ->
             if (purchased) {
                 binding.buttonPurchase.apply {
@@ -94,12 +112,46 @@ class TicketInformationFragment : Fragment() {
             }
         }
 
-
         binding.fabAddReview.setOnClickListener {
             showAddReviewDialog()
         }
     }
 
+    // 共有用メッセージ作成ヘルパー
+    private fun createShareMessage(ticket: TicketData): String {
+        return """
+            【Astra】おすすめの公演情報！
+            
+            公演名：${ticket.title}
+            場所：${ticket.place}
+            日付：${ticket.event_date}
+            
+            #Astra #アプリ紹介
+        """.trimIndent()
+    }
+
+    // OS標準の共有
+    private fun shareStandard(ticket: TicketData) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, createShareMessage(ticket))
+        }
+        startActivity(Intent.createChooser(intent, "チケット情報を共有"))
+    }
+
+    // X (旧Twitter) へ直接
+    private fun shareToX(ticket: TicketData) {
+        val tweetUrl = "https://twitter.com/intent/tweet?text=${Uri.encode(createShareMessage(ticket))}"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(tweetUrl))
+        startActivity(intent)
+    }
+
+    // LINE へ直接
+    private fun shareToLine(ticket: TicketData) {
+        val lineUrl = "https://line.me/R/msg/text/?${Uri.encode(createShareMessage(ticket))}"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(lineUrl))
+        startActivity(intent)
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
