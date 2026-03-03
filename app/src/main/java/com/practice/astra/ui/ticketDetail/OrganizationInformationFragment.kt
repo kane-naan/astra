@@ -41,11 +41,15 @@ class OrganizationInformationFragment : BaseTicketListFragment() {
         super.onViewCreated(view, savedInstanceState)
         observeAndSync(viewModel.organizationTickets, binding.recyclerView)
 
-        val reviewAdapter = ReviewAdapter { reviewData ->
-            val action = TicketDetailTabFragmentDirections
-                .actionTicketDetailTabSelf(reviewData.ticketId)
-            parentFragment?.parentFragment?.findNavController()?.navigate(action)
-        }
+        val reviewAdapter = ReviewAdapter(
+            onReviewClick = { reviewData ->
+                val action = TicketDetailTabFragmentDirections.actionTicketDetailTabSelf(reviewData.ticketId)
+                parentFragment?.parentFragment?.findNavController()?.navigate(action)
+            },
+            onLikeClick = { reviewData ->
+                viewModel.toggleReviewLike(reviewData)
+            }
+        )
 
         binding.recyclerViewReviews.apply {
             adapter = reviewAdapter

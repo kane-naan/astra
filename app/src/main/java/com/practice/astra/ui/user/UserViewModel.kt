@@ -121,4 +121,20 @@ class UserViewModel : ViewModel() {
             }
         }
     }
+
+
+    private val reviewRepository = com.practice.astra.repository.ReviewRepository()
+    fun toggleReviewLike(review: com.practice.astra.data.ReviewData) {
+        viewModelScope.launch {
+            try {
+                reviewRepository.toggleLike(review.id, review.likedBy)
+                val currentUid = auth.currentUser?.uid
+                val userIdToRefresh = targetUserId ?: currentUid
+
+                userIdToRefresh?.let { loadMyReviews(it) }
+            } catch (e: Exception) {
+                Log.e("UserViewModel", "いいね失敗", e)
+            }
+        }
+    }
 }

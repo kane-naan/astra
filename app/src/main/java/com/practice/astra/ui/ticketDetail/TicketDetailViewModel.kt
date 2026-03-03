@@ -268,4 +268,19 @@ class TicketDetailViewModel : ViewModel() {
             }
         }
     }
+
+    private val reviewRepository = com.practice.astra.repository.ReviewRepository()
+
+    fun toggleReviewLike(review: ReviewData) {
+        viewModelScope.launch {
+            try {
+                reviewRepository.toggleLike(review.id, review.likedBy)
+                selectedTicketDetails.value?.organizationId?.let {
+                    loadOrganizationReviews(it)
+                }
+            } catch (e: Exception) {
+                Log.e("TicketDetailViewModel", "いいね失敗", e)
+            }
+        }
+    }
 }

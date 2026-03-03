@@ -124,4 +124,17 @@ class TimelineViewModel : ViewModel() {
             }
         }
     }
+
+    private val reviewRepository = com.practice.astra.repository.ReviewRepository()
+
+    fun toggleReviewLike(review: ReviewData) {
+        viewModelScope.launch {
+            try {
+                reviewRepository.toggleLike(review.id, review.likedBy)
+                loadTimeline() // 全体リロード
+            } catch (e: Exception) {
+                Log.e("TimelineViewModel", "いいね失敗", e)
+            }
+        }
+    }
 }

@@ -16,7 +16,8 @@ import com.practice.astra.R
 class UnifiedListAdapter(
     private val onTicketClicked: (TicketData) -> Unit,
     private val onBookmarkClicked: (TicketData) -> Unit,
-    private val onReviewClicked: (ReviewData) -> Unit
+    private val onReviewClicked: (ReviewData) -> Unit,
+    private val onReviewLikeClicked: (ReviewData) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var items = listOf<TimelineItem>()
@@ -44,13 +45,11 @@ class UnifiedListAdapter(
         return when (viewType) {
             TYPE_TICKET -> {
                 val binding = TicketItemBinding.inflate(inflater, parent, false)
-                RecyclerViewHolder(binding)
+                com.practice.astra.ui.ticket.RecyclerViewHolder(binding)
             }
             TYPE_REVIEW -> {
                 val binding = ReviewItemBinding.inflate(inflater, parent, false)
-                ReviewAdapter.ReviewViewHolder(binding) { reviewData ->
-                    onReviewClicked(reviewData)
-                }
+                ReviewAdapter.ReviewViewHolder(binding, { onReviewClicked(it) }, { onReviewLikeClicked(it) })
             }
             else -> throw IllegalArgumentException("Invalid view type")
         }

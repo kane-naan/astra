@@ -1,6 +1,7 @@
 package com.practice.astra.ui.user
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +13,6 @@ import com.practice.astra.data.TicketData
 import com.practice.astra.databinding.FragmentUserBinding
 import com.practice.astra.ui.base.BaseTicketListFragment
 import com.practice.astra.ui.ticketDetail.ReviewAdapter
-
 
 // 定数の定義
 const val ARG_INITIAL_TAB = "initial_tab_index"
@@ -27,12 +27,17 @@ class UserFragment : BaseTicketListFragment() {
     // ViewModelの取得
     private val viewModel: UserViewModel by viewModels()
 
-    // アダプターをクラスプロパティとして定義
-    private val reviewAdapter = ReviewAdapter { reviewData ->
-        // クリックされた口コミに紐づく ticketId を使って遷移する
-        val action = UserFragmentDirections.actionUserToTicketDetailTab(reviewData.ticketId)
-        findNavController().navigate(action)
-    }
+    // アダプターの初期化（口コミクリックといいねクリックの動作を定義）
+    private val reviewAdapter = ReviewAdapter(
+        onReviewClick = { reviewData ->
+            val action = UserFragmentDirections.actionUserToTicketDetailTab(reviewData.ticketId)
+            findNavController().navigate(action)
+        },
+        onLikeClick = { reviewData ->
+            // ViewModelの関数を呼び出す
+            viewModel.toggleReviewLike(reviewData)
+        }
+    )
 
     // BaseTicketListFragmentから継承した機能
     override fun onTicketClicked(ticket: TicketData) {
@@ -55,20 +60,21 @@ class UserFragment : BaseTicketListFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // RecyclerViewの初期設定を一度だけ行う
+        // RecyclerViewの設定
         setupRecyclerView()
 
-        // データの監視を開始
+        // データの監視（LiveData）
         setupObservers()
 
         // クリックリスナーの設定
         setupClickListeners()
 
+        // 遷移元からのユーザーID取得
         arguments?.getString("userId")?.let { userId ->
             viewModel.setTargetUserId(userId)
         }
 
-        // データ取得の開始
+        // データ取得開始
         viewModel.loadUserData()
     }
 
@@ -77,7 +83,7 @@ class UserFragment : BaseTicketListFragment() {
             adapter = reviewAdapter
             layoutManager = LinearLayoutManager(requireContext())
             isNestedScrollingEnabled = false
-            setHasFixedSize(false) // 中身の量に合わせて高さを変える
+            setHasFixedSize(false)
         }
 
         binding.recyclerViewRecommended.apply {
@@ -88,11 +94,12 @@ class UserFragment : BaseTicketListFragment() {
     }
 
     private fun setupObservers() {
+        // プロフィール編集ボタン等の表示切り替え
         viewModel.isMyProfile.observe(viewLifecycleOwner) { isMyProfile ->
             binding.buttonFollow.visibility = if (isMyProfile) View.GONE else View.VISIBLE
         }
 
-        // プロフィールデータの監視
+        // ユーザー情報の反映
         viewModel.userData.observe(viewLifecycleOwner) { user ->
             binding.apply {
                 textName.text = user.name
@@ -100,27 +107,22 @@ class UserFragment : BaseTicketListFragment() {
                 textFollowing.text = "フォロー中 ${user.following.size}"
                 textFollower.text = "フォロワー ${user.follower.size}"
             }
-            viewModel.myReviews.observe(viewLifecycleOwner) { reviews ->
-                android.util.Log.d("DEBUG", "UserFragment - 取得した口コミ数: ${reviews.size}")
-                reviewAdapter.submitList(reviews)
+        }
+
+        // おすすめチケット一覧の同期（BaseTicketListFragmentの機能を利用）
+        observeAndSync(viewModel.recommendedTickets, binding.recyclerViewRecommended)
+
+        // 口コミ一覧の監視（ここ1箇所でリスト更新を管理）
+        viewModel.myReviews.observe(viewLifecycleOwner) { reviews ->
+            Log.d("DEBUG", "UserFragment - 取得した口コミ数: ${reviews.size}")
+            reviewAdapter.submitList(reviews)
+            // リスト更新後にレイアウトを再計算
+            binding.recyclerViewWriting.post {
                 binding.recyclerViewWriting.requestLayout()
             }
         }
-
-        // おすすめチケット一覧の同期
-        observeAndSync(viewModel.recommendedTickets, binding.recyclerViewRecommended)
-
-        // 自分の口コミ一覧の監視
-        viewModel.myReviews.observe(viewLifecycleOwner) { reviews ->
-            // データの件数をログに出力して確認
-            android.util.Log.d("DEBUG", "UserFragment - 取得した口コミ数: ${reviews.size}")
-
-            // アダプターにデータを渡す
-            reviewAdapter.submitList(reviews)
-        }
     }
 
-    // フォロー・フォロワー一覧への遷移
     private fun setupClickListeners() {
         binding.textFollowing.setOnClickListener {
             navigateToFollowList(TAB_INDEX_FOLLOWING)

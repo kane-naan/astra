@@ -92,6 +92,9 @@ class TimelineFragment : BaseTicketListFragment() {
                 val action = TimelineFragmentDirections
                     .actionNavigationTimelineToTicketDetailTab(review.ticketId)
                 findNavController().navigate(action)
+            },
+            onReviewLikeClicked = { review ->
+                viewModel.toggleReviewLike(review)
             }
         )
 
