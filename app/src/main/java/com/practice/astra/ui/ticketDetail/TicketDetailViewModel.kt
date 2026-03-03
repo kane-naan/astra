@@ -13,6 +13,7 @@ import com.practice.astra.data.TicketData
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import com.practice.astra.repository.TicketRepository
+import java.util.Date
 
 class TicketDetailViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
@@ -43,7 +44,7 @@ class TicketDetailViewModel : ViewModel() {
         if (ticket.price == 0 || ticket.price == null) "無料" else "¥${ticket.price}"
     }
 
-    // チケット詳細
+    // チケット詳細の読み込み
     fun loadTicketDetails(ticketId: String) {
         viewModelScope.launch {
             try {
@@ -52,10 +53,10 @@ class TicketDetailViewModel : ViewModel() {
                 if (document.exists()) {
                     val userDoc = db.collection("users").document(currentUserId).get().await()
 
-                    // ブックマーク状態の確認
+                    // ブックマーク状態の取得
                     val myBookmarks = userDoc.get("bookmark") as? List<String> ?: emptyList()
 
-                    // 購入済みリストに含まれているか確認
+                    // 購入済みリストの確認
                     val purchasedIds = userDoc.get("purchasedTicketIds") as? List<String> ?: emptyList()
                     _isPurchased.postValue(purchasedIds.contains(ticketId))
 
@@ -108,13 +109,9 @@ class TicketDetailViewModel : ViewModel() {
         }
 
         val uid = currentUserId
-        if (uid.isEmpty()) {
-            Log.e("DEBUG", "loadOrganizationTickets: userId is empty (Auth status error)")
-        }
-
         viewModelScope.launch {
             try {
-                // ユーザー情報取得を待機
+                // ブックマーク状態を反映させるためユーザー情報を取得
                 val userDoc = db.collection("users").document(uid).get().await()
                 val myBookmarks = userDoc.get("bookmark") as? List<String> ?: emptyList()
 
@@ -131,7 +128,8 @@ class TicketDetailViewModel : ViewModel() {
                 }
 
                 Log.d("DEBUG", "取得したチケット数: ${tickets.size}")
-                _organizationTickets.postValue(tickets)
+                // LiveDataへの通知（メインスレッドで実行）
+                _organizationTickets.value = tickets
             } catch (e: Exception) {
                 Log.e("TicketDetailViewModel", "団体チケット取得エラー", e)
             }
@@ -154,10 +152,15 @@ class TicketDetailViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 repository.toggleBookmark(ticketId)
-                val newState = !(_isBookmarked.value ?: false)
-                _isBookmarked.postValue(newState)
-                val orgId = _selectedTicketDetails.value?.organizationId
-                if (orgId != null) loadOrganizationTickets(orgId)
+
+                // ローカルのブックマーク状態を反転
+                val currentState = _isBookmarked.value ?: false
+                _isBookmarked.value = !currentState
+
+                // チケット一覧を再読み込み
+                _selectedTicketDetails.value?.organizationId?.let { orgId ->
+                    loadOrganizationTickets(orgId)
+                }
             } catch (e: Exception) {
                 Log.e("TicketDetailViewModel", "切り替え失敗", e)
             }
@@ -180,13 +183,9 @@ class TicketDetailViewModel : ViewModel() {
 
                     if (stock <= 0) throw Exception("在庫がありません")
 
-                    // 在庫を減らす
                     transaction.update(ticketRef, "stockCount", stock - 1)
-
-                    // ユーザーの購入リストに追加
                     transaction.update(userRef, "purchasedTicketIds", com.google.firebase.firestore.FieldValue.arrayUnion(ticketId))
 
-                    // 注文履歴を作成
                     val orderRef = db.collection("orders").document()
                     val orderData = mapOf(
                         "uid" to uid,
@@ -197,17 +196,15 @@ class TicketDetailViewModel : ViewModel() {
                 }.await()
 
                 Log.d("PURCHASE", "購入成功！")
-
-                // 成功時にLiveDataを更新
-                _isPurchased.postValue(true)
-                _purchaseSuccess.postValue(true)
+                _isPurchased.value = true
+                _purchaseSuccess.value = true
 
                 // 最新の情報を再読み込み
                 loadTicketDetails(ticketId)
 
             } catch (e: Exception) {
                 Log.e("PURCHASE", "購入失敗: ${e.message}")
-                _purchaseSuccess.postValue(false)
+                _purchaseSuccess.value = false
             }
         }
     }
@@ -219,7 +216,7 @@ class TicketDetailViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val userDoc = db.collection("users").document(userId).get().await()
-                val userName = userDoc.getString("name") ?: "名無しさん" // Firestoreのフィールド名に合わせて変更してください
+                val userName = userDoc.getString("name") ?: "名無しさん"
                 val userIconUrl = userDoc.getString("iconUrl") ?: ""
 
                 val review = ReviewData(
@@ -235,15 +232,17 @@ class TicketDetailViewModel : ViewModel() {
                     createdAt = com.google.firebase.Timestamp.now()
                 )
 
-                // 3. 投稿処理
                 val docRef = db.collection("reviews").document()
                 val finalReview = review.copy(id = docRef.id)
                 docRef.set(finalReview).await()
 
-                _postReviewSuccess.postValue(true)
+                _postReviewSuccess.value = true
+
+                // 投稿後に口コミ一覧を更新
+                loadOrganizationReviews(ticket.organizationId)
             } catch (e: Exception) {
                 Log.e("TicketDetailViewModel", "口コミ投稿エラー", e)
-                _postReviewSuccess.postValue(false)
+                _postReviewSuccess.value = false
             }
         }
     }
@@ -263,7 +262,7 @@ class TicketDetailViewModel : ViewModel() {
                     doc.toObject(ReviewData::class.java)
                 }.sortedByDescending { it.createdAt }
 
-                _organizationReviews.postValue(reviews)
+                _organizationReviews.value = reviews
             } catch (e: Exception) {
                 Log.e("TicketDetailViewModel", "口コミ取得失敗", e)
             }
