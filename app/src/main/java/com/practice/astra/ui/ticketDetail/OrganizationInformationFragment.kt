@@ -20,9 +20,9 @@ class OrganizationInformationFragment : BaseTicketListFragment() {
     override fun onTicketClicked(ticket: TicketData) {
         android.util.Log.d("DEBUG", "団体情報からチケットをクリック: ${ticket.id}")
 
-        val action = OrganizationInformationFragmentDirections
-            .actionOrganizationInformationToTicketDetailTab(ticket.id)
-        findNavController().navigate(action)
+        val action = TicketDetailTabFragmentDirections
+            .actionTicketDetailTabSelf(ticket.id)
+        parentFragment?.parentFragment?.findNavController()?.navigate(action)
     }
 
     override fun onBookmarkClicked(ticket: TicketData) {
@@ -42,9 +42,9 @@ class OrganizationInformationFragment : BaseTicketListFragment() {
         observeAndSync(viewModel.organizationTickets, binding.recyclerView)
 
         val reviewAdapter = ReviewAdapter { reviewData ->
-            val action = OrganizationInformationFragmentDirections
-                .actionOrganizationInformationToTicketDetailTab(reviewData.ticketId)
-            findNavController().navigate(action)
+            val action = TicketDetailTabFragmentDirections
+                .actionTicketDetailTabSelf(reviewData.ticketId)
+            parentFragment?.parentFragment?.findNavController()?.navigate(action)
         }
 
         binding.recyclerViewReviews.apply {

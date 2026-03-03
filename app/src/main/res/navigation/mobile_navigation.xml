@@ -85,6 +85,9 @@
     <fragment
         android:id="@+id/ticketDetailTabFragment"
         android:name="com.practice.astra.ui.ticketDetail.TicketDetailTabFragment" >
+        <action
+            android:id="@+id/action_ticketDetailTab_self"
+            app:destination="@id/ticketDetailTabFragment" />
         <argument
             android:name="ticketId"
             app:argType="string" />
